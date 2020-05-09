@@ -1,0 +1,303 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+%\usepackage[backend=biber,style=numeric]{biblatex}
+\usepackage[backend=biber,style=numeric,sorting=ynt]{biblatex}
+\usepackage[english]{babel}
+ 
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithm}
+\usepackage{numprint}
+\usepackage{listings}
+\usepackage{tabu}
+\usepackage{enumitem}
+
+\addbibresource{main.bib}
+
+\title{\centering \textbf{Second Year Review\thanks{Progress report and PhD vision}}\\Software Parallelisation:\\\textit{The Assistant Solution}}
+\author{Aleksandr Maramzin\\s1736883}
+\date{June 2019}
+
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\itshape\color{green},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1000
+  % frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=C,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=none,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{grey}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{purple},      % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\lstset{style=mystyle}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+% Problem: the need for manual parallelisation has not yet gone away, despite decades of work automatic parallelisation tools do not deliver desired performance improvements
+
+\quad Parallel hardware has become ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion: be it an old legacy software initially designed to run on the available at that time serial hardware or modern applications being developed by application domain experts rather than performance engineers. In order to exploit all available hardware facilities software has to be parallelised.\newline\null
+\quad The problem of software parallelisation is multifaceted and requires of programmers to possess an additional (apart from their application domain expertise) knowledge in various domains of parallel programming (from cache coherence protocols to high level algorithmic skeletons). For decades researches and engineers have been working on automatic parallelisation techniques, which are supposed to ultimately liberate programmers from the challenging task of manual parallelisation. But, despite the massive body of work on the subject, automatic techniques still cannot deliver performance levels expert programmers reach and are limited to narrow domains of scientific Fortran codes and relatively simple computational idioms.\newline\null
+\quad Given the difficulty of the obstacles faced by automatic parallelisation today, we do not expect a breakthrough in the area or a "silver bullet" solving the problem in the near future. We acknowledge the role of a human expert, but at the same time we propose an assistant solution, which can be used to guide programmer's efforts and alleviate the manual parallelisation task.\newline\null
+\quad The assistant solution we propose is as multifaceted as the problem itself and consists of several components aimed to tackle different aspects of software parallelisability. It is a toolkit rather than a single tool. The first tool in the toolkit has been designed, developed and assessed during the first year of my PhD. Complementary tools are supposed to be developed over the course of remaining time.\newline\null
+\quad The designed tool is basically a machine learning (ML) based model of loop parallelisability integrated and utilised into an assistant scheme. Assistant takes an application to be parallelised along with its profile as an input and presents a programmer with a ranking of application loops. In contrast to a profile guided approach, assistant's ranking highlights application loops, which are not only long-running (and thus potentially profitable), but crucially parallelisable. This way a programmer concentrates his efforts on promising application loops and converges to the best achievable performance faster. We have deployed our assistant on SNU NAS Parallel Benchmarks \cite{snu-npb-benchmarks} \cite{nasa-parallel-benchmarks} and demonstrated a potential of our idea \cite{aiseps}.\newline\null
+\quad The second tool we want to add to our software parallelisation toolkit solution is aimed at addressing the problem of unsuccessful data structure choice, which might turn a perfectly parallelisable at a higher level computation into a non-parallelisable lower level implementation. The tool is at the literature review and feasibility study stage.
+\end{abstract}
+
+\chapter{PhD Vision}
+\quad The problem of software parallelisation is multifaceted. A perfectly parallelisable at a higher level algorithm might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap allocated pointer linked data structures, indirect array referencing, etc. Compilers are usually powerless in front of such challenges and manual parallelisation is required. But the latter is hard and requires of programmers extra skills. My PhD task is to alleviate the manual parallelisation process.\newline\null    
+\quad My PhD studies go into the direction of software parallelisation assistance. The work started during my MSc by Research year with an idea of "Software Metrics for Parallelism". The idea was based on the similar work in the field of software quality metrics. Cyclomatic complexity (CC) software metric might be taken as an illustrative example, which quantitatively characterizes the difficulty of program comprehension. The idea of "Software Metrics for Parallelism" has passed through several stages of lost and revived interest. As we implemented our parallelisability metrics inside LLVM and finally got to see their behaviour on SNU NPB benchmark suite, we observed the weakness of metrics correlation with software parallelisability property. That was right at the end of my MSc by the Research. Then we decided to use the metrics as machine learning features and created a model of loop parallelisability. The predictive accuracy was initially low causing us to doubt in learnability of that property for SNU NPB suite. It took us a while before we managed to get an acceptable above 90\% level. At this point we realized that it is not enough to just learn loop parallelisability property. We developed an assistant scheme extending Intel Compiler's parallelism discovery capabilities. But parallelisability does not necessarily materialize into actual performance improvements. We had to create a crafty scheme taking an application profile and using ML model to ultimately point the best loops to concentrate a programmer efforts on. All that resulted into an end-to-end tool assisting a programmer by providing the latter with the best loop ranking to start parallelisation with.\newline\null
+\quad But the tool we developed is just a piece in a final solution package we aim to get. The next step would be to tackle the problem of heap allocated pointer linked data structures. At least we would like to develop a tool capable of their recognition (is it a tree or a linked list?, etc). As the literature review section of DCP project and SPEC CPU2006 feasibility studies show, static methods (such as shape analysis o
+r Idiom Description Language (IDL) based on a constraint solver) are unlikely to recognize data structures of SPEC CPU complexity level. We need to use dynamic techniques, which would recreate a dynamic model of data structure heap layout. Vast array of recent work in that direction proves that feeling.    
+
+\chapter{$1^{st}$ Year Timeline}
+\quad This chapter describes all activities I have been doing during the $1^{st}$ year of my PhD. Section \ref{active_timeline} maps them onto the year's timeline. Section \ref{active_description} gives detailed descriptions. Throughout the year I have been working withing the two projects: "Machine Learning Based Software Parallelisation Assistant (ML assistant)" and "Data-Centric Parallelisation (DCP)". The ML assistant project is the continuation of the work I have been doing throughout my MSc by the Research year. I have completed the project and wrapped it up in AI-SEPS 2019 workshop paper. The DCP project is at the planning stage with ongoing literature review and feasibility study. The work during the autumn months passed in 50/50 time slicing fashion between the two projects. In December I dropped DCP works and concentrated on the completion of ML assistant project. I completed the technical work on ML assistant project by the end of March. I am doing reporting and writing since then, as well as preparing the ground for the continuation of DCP project.
+   
+\section{The Timeline of My First Year 0Activities}
+\label{active_timeline}
+\begin{description}[style=nextline]
+\item [Sep (DCP project background reading)]\hfill
+\begin{itemize}
+%\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemi{$\bullet$}
+\item "Data-Centric Parallelisation" reading
+\item SPEC CPU2006 study
+\end{itemize}
+\item [Oct-Nov (50/50\%: DCP SPEC CPU2006 feasibility study +\\\ SNU NPB ICC optimisation reports parsing and study)]\hfill
+\begin{itemize}
+%\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemi{$\bullet$}
+\item Intel C/C++ Compiler optimisation report parser
+\item NAS benchmarks study
+\item SPEC CPU2006 study
+\end{itemize}
+\item [Dec (ML assistant feature engineering)]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item Intel C/C++ Compiler optimisation report parser
+\item Feature engineering
+\item First assistant scheme assessment
+\item PPar lunch talk preparation
+\end{itemize}
+\item [Jan (ML assistant feature engineering)]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item Feature engineering
+\item First assistant scheme assessment
+\item PPar lunch talk preparation
+\end{itemize}
+\item [Feb (ML assistant train/test methodology debugging and tuning)]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item ML methodology tuning
+\item IEE2019 poster preparation
+\end{itemize}
+\item [Mar (ML assistant SNU NPB deployment: benchmark performance runs (commenting out and back OpenMP pragmas))]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item ML methodology tuning
+\item Second assistant scheme assessment
+\item PACT2019 paper writing
+\end{itemize}
+\item [Apr (PACT2019 paper writing)]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item PACT2019 paper writing
+\item HiPEAC HPC week poster preparation
+\end{itemize}
+\item [May]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item Vacation
+\item AI-SEPS2019 paper writing
+\end{itemize}
+\item [Jun (AI-SEPS2019 workshop paper writing)]\hfill
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item "Data-Centric Parallelisation" reading
+\item First Year Report writing
+\item AI-SEPS2019 paper writing
+\end{itemize}
+\end{description}
+\section{Detailed Description of Activities}
+\label{active_description}
+
+\subsection{Machine Learning Related Tasks}
+\quad The machine learning (ML) task solved withing the project of ML assistant can be presented as \textbf{supervised ML classification problem}: \textit{create an ML model of loop parallelisability and train it to classify loops of Seoul National University implementation \cite{snu-npb-benchmarks} of NAS Parallel Benchmarks \cite{nasa-parallel-benchmarks} as parallelisable or not}. The task of ML model creation can be subdivided into 5 sub tasks:
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item Data set (SNU NAS Parallel Benchmarks) study
+\item Obtaining loop classification labels for SNU NPB
+\item Loop feature engineering
+\item Loop feature extraction
+\item ML train/test methodology tuning
+\end{itemize}
+\quad The tasks are interdependent and cannot be solved in isolation from each other. The process had to be repeated over and over until satisfactory (above 90\%) ML model predictive performance has been achieved.
+
+\paragraph{Data set study: insight into the sources of SNU NAS Parallel Benchmarks}
+All works withing the project have been accompanied by the ongoing insight into the sources of SNU NAS Parallel Benchmarks (SNU NPB) conducted from the angle of loop parallelisability. The benchmarks have been compiled with Intel C/C++ Compiler (ICC) in order to produce its optimisation (including parallelisation and vectorisation) reports. The reports have been matched against the source code and examined manually. That helped in understanding of what kind of loops constitute SNU NPB suite, capabilities of ICC compiler in its parallelisation and the problems ICC faces. ICC manages to discover only 86\% of all parallelisable loops present in SNU NPB. We classified the remaining cases into different buckets explaining what exactly makes ICC fail. The paper we have written \cite{aiseps} contains a detailed report. There are numerous documents in the project repository \cite{github-ppar-tool} describing SNU NPB suite. Here we present just a brief summary.\newline\null
+\quad SNU NPB benchmark suite consists of 9 benchmarks. The nature of different SNU NPB benchmarks varies. Benchmarks BT, LU and SP form a cluster and perform basically the same computation. Loops withing these benchmarks work on multidimensional arrays, are highly parallelisable (some need function inlining to be done upfront) and resemble each other. But the whole performance of these benchmarks is concentrated in 3 (out of ~190) big and complex loops. ICC cannot conduct such a coarse-grain parallelisation and does not accelerate these benchmarks. CG benchmark contains simple loops and reductions. DC benchmark is a very hard to parallelise one. DC contains loops, where it is hard to compute iteration count before executing them, as well as \textit{while} loops with unidentifiable control variables, loops, which contain irregular memory loads and stores to arrays and loops with multiple exits. SNU NPB expert developers extract performance out of DC benchmark by parallelising a single section of the source code. Neither compiler, not ML assistant can do that. IS benchmark has a very similar nature and performance comes here from the parallelisation of source code section. Thus, our ML assistant is not applicable to DC and IS benchmarks. Majority of UA benchmark loops contain entangled control flow, indirect memory references and numerous function calls. The benchmark is incredibly hard to parallelise. Parallelisation requires either an expert benchmark knowledge or runtime information.
+
+\paragraph{Obtaining loop classification labels}
+The quality and precision of loop classification labels seem to have a direct effect on the predictive performance of our ML model. In order to gather the final set of loop classification labels for all 1415 loops of SNU NAS Parallel Benchmarks we had to use 3 methods:
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item OpenMP \textit{#pragmas} source code extraction script
+\item Intel C/C++ Compiler (ICC) optimisation report parser \cite{github-icc-parser}
+\item Manual SNU NPB examination and verification of labelled loops
+\end{itemize}
+The task of obtaining loop parallelisability classification labels for SNU NPB has already been conducted during my MSc by Research year, but there were certain deficiencies in it. First, I used only ICC optimisation reports (without human added OpenMP pragmas available in SNU NPB) for loop labels. While ICC labels precisely and conservatively capture static program dependencies, they miss a lot of opportunities. If we use ICC labels as the only source on parallelisability of program loops our trained model will be inherently limited in its capabilities and is not expected to perfrom any better than ICC itself. Second, Intel Compiler is quite diverse in its treatment of program loops. It does not simply parallelise or vectorise the loop, but applies a lot of different enabling loop transformations and optimisations before the actual parallelisation happens. Among those are loop interchange, distribution, fusion, tiling, collapsing (see \cite{Bacon:1994:CTH:197405.197406}). ICC may distribute a loop nest into several parts and parallelise only some of them. Loop nests might end up being completely restructured and spread throughout the whole ICC optimisation report. Several levels deep function inlining introduces additional difficulties. These effects complicate not only the technical extraction of information out of ICC reports, but the definition of loop parallelisability itself. We consider a loop as being parallelisable if ICC has not found any dependencies in it and either vectorised or parallelised it. In the case of loop distributions we act in a recursive fashion and consider a loop to be parallelisable if and only if all its constituent parts are parallelisable themselves. Some of the issues persisted even after ICC optimisation report parser has been significantly elaborated redesigned and rewritten a couple of times and we had to verify our results manually on top of all. All these difficulties have been skipped during my MSc by Research due to the time constraints and as a result we had managed to approximate (with the help of simplified Bash scripts) classifications for \~1260 loops only. The remaining 1415-1260=155 loops had broken our script and managed to escape our grasp. But this difference of 155 loops seems to be the most interesting as these represent the most complicated SNU NPB loops being tackled by the ICC and hence potentially capable of giving us the most precious insight into the parallelisability of loops. While OpenMP pragmas source code extraction task boils down to a simple 20 LOC (Lines Of Code) Bash script, the development of ICC optimisation report parser resulted into a tool \cite{github-icc-parser} of approximately 2000 Python LOC.
+
+\paragraph{Feature engineering}
+The feature engineering efforts conducted during my first year have increased the size of the feature set from 16 to 74 metrics. The latter brought an accuracy of our ML model up from 77\% to above 90\%. As an LLVM-based PPar tool \cite{github-ppar-tool} building Program Dependence Graph (PDGs) \cite{Ferrante:1987:PDG:24039.24041} and performing an iterator recognition analysis \cite{Manilov:2018:GPI:3178372.3179511} on it has already been developed during my MSc by Research year, the addition of new loop features became a relatively straightforward task. In order to add a new feature to our ML model one needs to perform the following steps: 
+\begin{itemize}
+\renewcommand\labelitemi{$\bullet$}
+\item Implement a feature computing LLVM pass using developed during MSc by Research C/C++ templates \cite{github-ppar-tool}
+\item Run a newly developed LLVM pass on toy examples in the playground folder and manually verify its correctness with the help of DOT printed graphs 
+\item Run feature computing passes of PPar tool on SNU NPB benchmarks and update an excel table with a new feature
+\item Run ML train/test script and get an accuracy number
+\end{itemize}
+Guided by the study of SNU NPB source code, ICC optimisation reports and DOT format visualisations of PDG graphs the above sequence has been iteratively repeated up until the point of reaching 93-94\% prediction accuracy on certain feature subsets by the means of K-fold CV. Although the reached accuracy is close to perfect, the train/test script I used to get to that point was simplistic and did not fully correspond to a standard way of setting an ML pipeline (automatic feature selection, model selection and the tuning of its hyper-parameters, different testing approaches, etc.). Moreover, I have been manually choosing different subsets of loop features in an attempt to get the best accuracy. In the task of feature engineering I just finished with the implementation of features in LLVM and the preparation of the final data set with candidate features to use.
+
+\paragraph{ML methodology tuning}
+Once I implemented all ML loop features and gathered the data, I moved to the task of aligning my training and testing methodology with the standard accepted one to make my results more credible. As the one who does not possess a significant ML background I used a practical hands-on approach in an attempt to get the final results faster. I read scikit-learn library \cite{scikit-learn} documentation on different stages of ML pipelines and developed a Python scripting framework, which can be used for conduction of different ML train/test experiments with a range of varying parameters. As I moved from my simplified ML scripts I used during feature engineering task onto a more consistent train/test methodology my newly developed scripting framework offered, the accuracy dropped from 93-94\% down to 84-87\% and I had to repeatedly tune my ML pipeline by trying out different ML models (SVC, Neural Networks, Decision Trees, etc.) and pipeline configurations to get back to above 90\% accuracy. Every new configuration and model to try required an extension of the scripting framework, which eventually resulted into 2900 Python LOC in total. The scripting framework is configured with INI files provided as input. INI files specify the exact parameters on every ML pipeline stage. For example, SVC pipeline has been configured in the following way. First, apply standard scaler to preprocess feature values and get them to the same centered range. Then apply a sequence of automatic feature selection steps (Low Variance Filter, fit DT model and select features with highest importance scores, run RFECV twice maximizing precision and then accuracy scores). After that we select the best set of hyper-parameters of SVM by running GridSearchCV several times and searching the chosen grid of hyper-parameters. At last we run our training and testing experiments and do reporting. Scripting framework included the code I used to report on different ML assistant schemes I estimated as well.
+
+\subsection{Parallelisation Assistant: Design and Assessment}
+
+\paragraph{First assistant scheme assessment}
+ML train/test scripting framework has been extended to report on ICC competition scheme described in the paper \cite{aiseps}. Scripting framework does K-Fold CV and calculates the distribution of ICC/Predictor/TrueParallelisability cases along with some other statistics. The scheme assesses predictor's capabilities in extending the amount of true parallelism ICC finds in SNU NPB.
+
+\paragraph{Second assistant scheme assessment}
+\quad In order to assess the final scheme of ML based assistant I had to choose the function I am going to use to combine loop runtime and its ML model reported parallelisability. After that I received rankings for all SNU NPB benchmark loops. Loops have been ordered by their running time and by assistant advised order as well. The task of assessment the effectiveness and utility of our assistant boiled down to partially parallelising SNU NPB benchmarks loop by loop and getting their speedups. The task was tedious and manual. It took around a month to get all performance data for all ML models (SVC, RFC, DT, MLP, AdaBoost). I have been doing it by commenting and uncommenting OpenMP pragmas and running the benchmarks on my DICE machine. As a result I plotted performance convcergence curves, which can be found in the paper \cite{aiseps}.  
+
+\subsection{"Data-Centric Parallelisation" project}
+\quad The report on DCP project activities is given in a form of DCP project literature review and the feasibility study of 429.mcf, 400.perlbench, 456.hmmer, 470.lbm benchmarks in DCP chapter.
+
+\chapter{"Smart" Parallelisation Assistant}
+\label{chapter_ml_assistant}
+\quad This chapter tells the story around the work \cite{aiseps} prepared for the AI-SEPS 2019 workshop titled "AI-Inspired and Empirical Methods for Software Engineering on Parallel Computing Systems". The paper on the work \cite{aiseps} reports on the results and contains an in-depth technical description, which has not been replicated in this chapter.
+
+\section{Literature Review}
+\paragraph{Quantitative Metrics for Software} The project started with a goal of providing a programmer with a quantitative software metrics for parallelism as a feedback on the potential parallelisability of a source code. The idea has been drawn from the existence of various quantitative metrics in the other fields of computer science. \textit{Cyclomatic Complexity (CC)} metric \cite{McCabe:1976:CM:800253.807712} can be used as an illustrative example. Informally CC can be defined as a number of independent paths through the section of a source code. CC reflects the amount of efforts a programmer should apply in order to comprehend a source code. There are numerous other metrics existent in the field of software quality. \textit{Source Lines of Code (SLOC)} is probably one of the oldest. \textit{Halstead software science} \cite{Halstead:1977:ESS:540137} is built as an analogy to measurable properties of a matter (volume, mass and pressure of a gas). The work operates with such notions as program length, program volume and program difficulty based on the number of distinct operands and operators in the program. The metrics of \textit{Software Cohesion and Coupling} \cite{Stevens:1974:SD:1661066.1661068} can be used to judge on the design of object-oriented software. Coupling is the degree of interdependence between software modules, while cohesion refers to the degree to which the elements inside the module belong together. Low coupling and high cohesion are usually a sign of a well-designed system. There are many more different metrics of that kind. These metrics can be used to assess the complexity and the soundness of software design and reflect the overall software quality and its maintainability in the long run.\newline\null
+\quad To all this abundance of software quality metrics our initial literature review discovered none metrics on software parallelisability but different variations on parallel program speedup (like absolute, asymptotic, real, etc) and we went on to develop and assess our own set of metrics. We compute our software parallelisability metrics for program loops as loops usually represent the most computationally intensive program parts and potentially contain per iteration parallelism. We base our metrics around the concepts of \textit{Program Dependence Graph (PDG)} \cite{Ferrante:1987:PDG:24039.24041} and \textit{Generalised Loop Iterator} \cite{Manilov:2018:GPI:3178372.3179511}. The metrics are elaborations on different structural properties of PDG graphs (like the number of dependence edges, loop iterator size, number of load instructions, etc.). As my MSc by the Research work has demonstrated these metrics do not strongly correlate with the parallelisability property of program loops. Although metrics show some connection, the correlations are not strong enough for a single metric to be able to separate the sets of parallelisable and non-parallelisable loops. For these reasons we decided to harness all our devised metrics altogether as features in the machine learning based model of loop parallelisability.
+\paragraph{Machine Learning in Optimising Compilers} Machine learning techniques have found their application to the field of optimising compilers since the mid 1990s and have become the mainstream activity in the past two decades. The papers \cite{ml-oboyle} \cite{Ashouri:2018:SCA:3271482.3197978} present surveys of the field highlighting the major ideas and works. Numerous problems in the field of optimising compilers have been framed and formulated as machine learning regression or classification problems and tackled thereafter with various algorithms (SVMs, Neural Networks, Decision Trees, etc.). Examples might be predicting the execution time of programs, selecting the best parameters for compiler optimisations (loop unroll factors, thread coarsening factors, number of parallel threads, etc.), predicting the best potential hardware to run a program on (CPU vs. GPU), etc. The one common attribute of all these problems as far as machine learning based solutions are concerned is safety. Even if we mispredict the selection or the sequence of optimisations to apply to a source code we are not going to break a program. Mispredictions here will ultimately result into performance losses, but won't compromise the functionality of a program.
+\paragraph{Machine Learning Based Loop Parallelisability Model} Our work is novel in the respect that we step into a potentially dangerous area and are trying to predict if a program loop is parallelisable or not. False positives can functionally break a program. For that reason having achieved predictive accuracy of above 90\% we integrate our predictor into an assistant scheme, which requires a final programmer approval. The latter mitigates ineradicable statistical errors inherent to all machine learning techniques and finds a practical application of our predictor. There has been another attempt to tackle our problem. The work titled "Predicting Parallelization of Sequential Programs Using Supervised Learning" \cite{fried_ea:2013:icmla} is very similar to ours, but at the same time has substantial differences. The authors use dynamic program features, while we are using static ones. The benchmarks suite is the same, but the way the loops are labelled is different. Authors use only OpenMP pragmas as the answers regarding loop parallelisability. There are a total of 1415 loops and 211 OpenMP pragmas, which makes a data set highly unbalanced and sets a high reference baseline to compete against. Authors report the accuracy of 85\%, 88\%, 91\% against 81\% baseline. But the parallel loops present in SNU NAS Parallel Benchmarks are not limited to those labelled with OpenMP pragma. We use Intel Compiler to supplement the set of "yes" answers and finally get 995/1415 positive answers. As developers of SNU NPB strive to get a coarse grain parallelism and put pragmas in front of major long running loops the 211/1415 data set seems to capture "big" loops rather than "parallelisable". Unsurprisingly authors find that the amount of dynamic instructions in a loop feature has the best correlation with the labels. Moreover, in our work we went on further to propose a practical assistant scheme.     
+
+\chapter{"Data-Centric Parallelisation"}
+\label{chapter_dcp}
+\quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
+\begin{minipage}[t]{0.45\linewidth}
+\begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
+for (int i=0; i<n; it++) {
+  a[i]=a[i]+1;
+}
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}[t]{0.55\linewidth}
+\begin{lstlisting}[caption={Non-parallelisable loop operating on a \textbf{linked-list}.},label={lst:list},language=C]
+for (p=list; p!=NULL; p=p->next) {
+  p->value+=1;
+}
+\end{lstlisting}
+\end{minipage}
+\quad Listings \ref{lst:array} and \ref{lst:list} illustrate two alternative implementations of the same simple computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelisability.\newline\null
+\quad In the project of "Data-Centric Parallelisation (DCP)" we would like to automatically recognise 
+
+\section{Literature Review}
+\label{dcp_literature_review}
+\quad The idea of automatic discovery of higher level entities in programs is not a new one. This discovery problem is closely interlinked and entangled with alias analysis techniques \cite{Muchnick:1998:ACD:286076} like points-to analysis \cite{Emami:1994:CIP:178243.178264}. Points-to analysis is a variation on data flow analysis techniques. The final output is the sets of pairs of the form (\textit{p},\textit{x}) (pointer variable \textit{p} points to a stack allocated variable \textit{x}). These techniques are aimed at getting aliasing information regarding stack-allocated pointers.\newline\null
+\quad The problem of understanding heap-directed pointers and heap-allocated linked data structures these pointers might point to is addressed with a family of static analysis techniques collectively known as shape analysis. Shape analysis techniques can be used to verify properties of dynamically allocated data structures in compile time. These are among the oldest and most well known techniques. Three-valued logic \cite{Sagiv:1999:PSA:292540.292552}\cite{Wilhelm:2000:SA:647476.760384} can be used as an example. The technique proposes a construction of a mathematical model consisting of logical predicate expressions. The latter correspond to certain pointer operating imperative language program statements. Abstract interpretation of these statements leads to a construction of sets of shape graphs at various program points. Shape graphs approximate the possible states of heap-allocated linked data structures and answer the questions such as node reachability, data structure disjointness, cyclicity, etc. The major limitation of these simplified mathematical models is the lack of precision high level of abstraction leads to. The problem of precise shape analysis is provably undecidable.\newline\null
+\quad The work of \cite{Ghiya:1996:TDC:237721.237724} proposes a simplified and hence more practical implementation of shape analysis. Authors propose to use direction \textit{D} and interference \textit{I} matrices instead of complex mathematical models in order to derive shape information on heap allocated data structures. The entry of direction matrix \textit{D[p,q]} says if there exists a path from a node referred to by \textit{p} to a node referred to by q. In other words, if we can enter a path withing the data structure through \textit{p} and exit through \textit{q}. The entry of interference matrix \textit{I[p,q]} says if the paths started from \textit{p} and \textit{q} are going to intersect at some point. Authors implement their technique withing McCAT compiler, which uses SIMPLE intermediate representation with a total of 8 statements (\textit{malloc()}, pointer assignments \textit{p=q}, structure updates \textit{p-$>$next=q}), which are capable of changing \textit{D} and \textit{I} matrices. Statements generate and kill entries in matrices. Moreover, they are capable of changing \textit{Shape} attribute of pointers. The technique has been assessed on various benchmarks (bintree, xref, chomp, assembler, loader, sparse, etc.) from the era before the standard benchmark suites became available. The technique mostly reported shapes as \textit{Trees} (be it a binary tree or a linked-list) or sometimes as \textit{DAGs} or \textit{Cycles} but with higher error rates in these last cases. The latter shows that the technique is imprecise and conservative.\newline\null
+\quad One of the more recent techniques designed and developed by Philip Ginsbach and Michael F. P. O’Boyle is based on the pattern matching on LLVM IR level. The main idea is to specify computational idioms to be recognized in a domain specific constraint based programming language CAnDL \cite{Ginsbach:2018:CDS:3178372.3179515}. Constraints are specified over LLVM IR entities such as instructions, basic blocks, functions, etc. The CAnDL language allows for a rapid prototyping of new compiler optimisations based on pattern recognition and its substitution with an optimised versions of matched idioms. The language and its relatively fast backtracking constraint solver are capable of recognizing not only simple arithmetic idioms (thus performing different peephole optimizations), but more complex computations like general reductions and histograms \cite{Ginsbach:2017:DEG:3049832.3049862}, vector products in graphics shaders \cite{Ginsbach:2018:AML:3296957.3173182}, sparse and dense linear algebra computations and stencils \cite{Ginsbach:2018:AML:3296957.3173182}. Having recognized these computational idioms the work \cite{Ginsbach:2018:AML:3296957.3173182} replaces them with a code for various heterogeneous APIs (MKL, libSPMV, Halide, clBLAS, CLBlast, Lift) and compares the resulting performance demonstrating an improvement over sequential versions and matching performance to a hand-written parallel versions. The technique has been deployed on the sequential C versions of SNU NPB, the C versions of Parboil and the OpenMP C/C++ versions of Rodinia demonstrating an improved detection capabilities over the state-of-the-art techniques.\newline\null
+\quad The other principally different technique has been recently proposed by Changhee Jung and Nathan Clark \cite{1669122}. The authors developed a Data-structure Detection Tool (DDT) based on LLVM framework. The tool instruments loads, stores and calls withing program binaries and gathers dynamic traces for sample inputs. The traces are used to recreate a memory allocation graph for program data structures. Call graphs are used to identify interface functions interacting with the built memory graph. DDT traces memory graph properties (number of nodes, edges, etc.) before and after interface function calls into another Daikon tool to compute dynamic invariants (the number of nodes in a memory graph decreses by 1 after every \textit(delete()) interface method call, etc.). At the end manually constructed decision tree is used to probabilistically match observed behavioral patterns against known data structure invariant properties. The technique has been deployed to recognise data structure implementations withing standard libraries like STL, Apache (STDCXX), Borland (STLport), GLib, Trimaran achieving almost perfect recognition accuracy. Moreover, the technique has been able to recognise linked lists in Em3d and Bh Olden benchmarks, along with red-black trees implementing vectors in Xalancbmk benchmark.\newline\null
+\quad There has recently been other published works on the application of dynamic techniques to the problem of dynamic data structure recognition \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}. The technique used in the DDT tool \cite{1669122} makes an assumption, that all modifications and interactions with memory graphs representing data structures happen through a set of interface functions. That is not true, when we deal with aggressively optimising compilers, which may eliminate some code or inline some functions. The MemPick tool \cite{Haller:2016:SDS:2938006.2938029} searches data structures directly on a built dynamic memory graph by analyzing its shape. The graph is built with the help of Intel Pin binary instrumentation tool during quiescent periods, when pointer operations are absent. DSIbin tool \cite{Rupprecht:2017:DID:3155562.3155607} operates with the source code rather than program binaries. Instead of memory points-to graphs it uses strands as primitives, which abstract such entities as singly-linked lists.\newline\null
+\quad The work of Dekker \cite{Dekker:1994:ADS:3107859.3107876} addresses software design recovery problem in a completely different way. Contrary to the approaches described above, which operate on the IR and dynamic instruction stream levels, work of Dekker operates at the level of abstract syntax tree. Dekker's tool tries to compact the tree down to a recognizable syntactic patterns by transforming it in accordance to a special grammar.
+
+\section{SPEC CPU2006 Feasibility Study}
+\quad In order to find the ground for the excavation of data structures we conducted a study of SPEC CPU2006 benchmarks. We examined the data structures used withing benchmark hotspots. The motivation behind this is that it is not enough to just recognise the data structures. Having done so, ideally we would need to replace them with faster versions and get performance improvements. On my side I've looked into \textit{429.mcf}, \textit{400.perlbench}, \textit{456.hmmer} and \textit{470.lbm} benchmarks. Paragraphs below present a quick summary.
+
+\paragraph{429.mcf} The top hotspots of the benchmark are functions \textit{refresh\_potential()} and \textit{primal\_bea\_mpp()}. Each of these functions alone accounts for around 35\% of CPU time. The benchmark operates with a network of nodes and arcs. The latter two are linearly allocated in the heap memory with \textit{malloc()} function calls. Despite simplicity of allocation every node and arc structure has numerous pointers, which span several object linking chains. Pointers are set in different places withing the source code base during allocation as well as during consecutive network structure updates. Function \textit{refresh\_potential()} consists of several folded while loops, which go down the network in a depth first search manner starting at root node and following through child and then siblings pointers up until the dead end is met and then returning back up to the root node. That traversal is made in order to update all floating point potentials of network nodes, hence the name of the function. The network is some form of a spanning tree with several properties true of its nodes. Every node has only one child pointer at most. If node has several children they are connected through sibling pointers starting from the first child. If \textit{refresh\_potential()} function updates network nodes, the \textit{primal\_bea\_mpp()} function works with network arcs. It puts network arcs into different baskets and makes basket permutations according to its optimality criterion. It returns the arc out of the first basket as the most optimal.\newline\null
+\quad\textbf{The benchmark presents a high interest from the point of data structure recognition. Although static techniques discussed in the literature review section are unlikely to tackle that level of complexity and dynamic techniques are required.}
+
+\paragraph{456.hmmer} Searches a DNA sequence database given a Progile Hidden Markov Model (HMM). The hotspot is \textit{P7Viterbi()} function being called for every database sequence in the main loop. The function scores sequences using Viterbi algorithm. The implementation works with four dynamic programming matrices (Match - MMX, Insert - IMX, Delete - DMX, Extra - XMX) allocated linearly as arrays. Algorithm walks either horizontally (I,X) or diagonally (M,D) along these matrices and computes reductions of maps. The computation is parallelisable and there has been works doing it \cite{Ganesan:2010:AHG:1854776.1854844}\cite{inria} and accelerating the benchmark on specialised hardware.\newline\null
+\quad\textbf{The benchmark operates with matrices laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. The benchmark would be interesting from the point of algorithmic skeletons recognition, but the \textit{P7Viterbi()} core is relatively complex.} 
+
+\paragraph{400.perlbench} This benchmark is a cut-down Perl interpreter. As our hotspot analysis showed \textit{S\_regmatch()} is the main consumer of CPU time. This function implements a regular expression matching state machine. Listing \ref{lst:perlbench} shows the source code of the function. Function \textit{S\_regmatch()} takes a pointer to the bitcode of compiled regular expression and processes it instruction by instruction. Although instructions have the same size and are linearly laid out in the memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. Every case of the gigantic (1541 LOC) \textit{switch} statement interprets bitcode instructions according to their opcode semantics. The latter examines external buffer with a string to match and can be arbitrarily complex leading to recursive \textit{S\_regmatch()} calls and goto jumps. This code requires sequential execution and is beyond the capabilities of any surveyed techniques.
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={\textbf{regexec.c(2296)}: Regular expression matching state machine},label={lst:perlbench},language=C]
+
+S_regmatch(regnode *prog) {
+    regnode* scan;
+    
+    scan = prog;
+    while (scan != NULL) {
+        next = scan + scan->next_off
+        switch(OP(scan)) {
+        case SEOL:
+            ...
+            goto no;
+        case MEOL:
+            ...
+        case EVAL:
+            S_regmatch(...);
+        case EXACT:
+            ...
+        }
+    
+    }
+}
+\end{lstlisting}
+\end{minipage}
+
+\quad\textbf{The benchmark is neither parallel nor a simple one. And it makes no point to apply any recognition techniques here.}
+
+\paragraph{470.lbm} The benchmark implements a Lattice Boltzmann Method (LBM) and is a relatively simple one (around ~1400 LOC). The hotspot is \textit{LBM\_performStreamCollide()} function. The main underlying data structures our benchmark works with are the two 3D grids (\textit{Src} and \textit{Dst}) mapped onto a linear array space, which simulate incompressible fluids in 3D. The benchmark runs a specified number of time steps. During each time step the benchmark linearly runs along \textit{Src} array. Every array element represents a point from a 3D grid and consists of a number of velocity vector projections (South, North, East, West, Top, Bottom,  ... , South-East, etc.) at this point. The values of these projections are being combined and mapped in a stencil fashion onto adjacent elements of independent \textit{Dst} array. The computation is highly parallel and corresponds to a sweeping of \textit{xy} planes (one plane after another) along \textit{z} axis. The benchmark has already been parallelised with an OpenMP pragma in a per element fashion. This benchmark could potentially be used for the discovery of stencil computational idioms. Linear arrays being used in the benchmark do not represent a huge amount of interest from a data-centric point.\newline\null
+\quad\textbf{The benchmark operates with 3D grids laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. It would be interesting to try to recognize an algorithmic stencil.}
+
+\section{DCP plan}
+\quad I am planning to work solely on the DCP project throughout the second year of my PhD. This section very roughly approximates the plan I am going to follow.
+
+\begin{description}[style=nextline]
+\item [Detailed Literature Review] Get into the details of currently available dynamic data structure recognition tools (like MemPick, DDT, ARISTE, DSI, DSIbin, HeapDbg, DsOli, etc.). The detailed study will help me see the current deficiencies of these tools, competing techniques they use, the results they manage to achieve. 
+
+\item [Technical Implementation Planning] In this stage I would need to choose the exact libraries and frameworks I will use as the base for the implementation of my data structure recognition tool. Currently I am looking at Pin and LLVM. Pin is a dynamic binary instrumentation framework for the IA-32, x86-64 and MIC instruction-set architectures that enables the creation of dynamic program analysis tools. Alternatively, instrumentation can be done at LLVM IR level.
+
+\item [The Search of Suitable Benchmarks] SPEC CPU2006 benchmarks proved to be difficult for automatic (and even manual) data structure recognition. Maybe MCF benchmark could be used for an attempt to dynamically recognize a tree like data structure, but for a more feasible result we would need to find simpler benchmarks. SNU NPB benchmarks do not contain any data structures but linear arrays. A study of Olden benchmarks could be conducted. There has been proposed an idea of searching GitHub through its API for a simpler examples being from a real world at the same time. Alternatively Rodinia and Parboil benchmark suites might be used for a study.
+
+\item [Memory Graph Construction] In this task we need to determine the exact way we are going to build a graph. The types of nodes and the way we connect them. Majority of tools like DDT \cite{1669122} use heap allocated nodes as memory graph composing elements. On the contrary Data Structure Investigator (DSI) tool \cite{Rupprecht:2017:DID:3155562.3155607} uses strands (abstractions over a linked list data structure) as primitives chasing recognition of Linux kernel CDLL list of different element types. The task is similar to the task of compiler's Intermediate Representation (IR) design and is going to affect all other stages.
+
+\item [Memory Graph Analysis] Once the memory graph corresponding to some particular instance of dynamic program execution is built, the task is to recognize a data structure the graph might correspond to. The current techniques examine the properties of memory graphs (the number of edges per node, cycles, connectivity, etc.), try to apply machine learning and clustering techniques in order to learn to recognize  
+\item [Data Structure Replacement] This is the most ambitious goal one might dream to achieve. Neither of all available tools has managed to do that. The task is to detect and replace unsuccessfully chosen data structure variants with a better suited one (like AVL tree instead of a binary search tree).   
+
+\end{description}
+
+\printbibliography
+
+\end{document}
