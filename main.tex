@@ -19,9 +19,9 @@
 
 \addbibresource{main.bib}
 
-\title{\centering \textbf{Second Year Review\thanks{Progress report and PhD vision}}\\Software Parallelisation:\\\textit{The Assistant Solution}}
+\title{\centering \textbf{Second Year Review\thanks{Progress report and PhD vision}}\\Towards Alleviating The Task of Software Parallelization}
 \author{Aleksandr Maramzin\\s1736883}
-\date{June 2019}
+\date{June 2020}
 
 \lstdefinestyle{mystyle}{
   backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
@@ -76,41 +76,48 @@
 \quad But the tool we developed is just a piece in a final solution package we aim to get. The next step would be to tackle the problem of heap allocated pointer linked data structures. At least we would like to develop a tool capable of their recognition (is it a tree or a linked list?, etc). As the literature review section of DCP project and SPEC CPU2006 feasibility studies show, static methods (such as shape analysis o
 r Idiom Description Language (IDL) based on a constraint solver) are unlikely to recognize data structures of SPEC CPU complexity level. We need to use dynamic techniques, which would recreate a dynamic model of data structure heap layout. Vast array of recent work in that direction proves that feeling.    
 
-\chapter{$1^{st}$ Year Timeline}
-\quad This chapter describes all activities I have been doing during the $1^{st}$ year of my PhD. Section \ref{active_timeline} maps them onto the year's timeline. Section \ref{active_description} gives detailed descriptions. Throughout the year I have been working withing the two projects: "Machine Learning Based Software Parallelisation Assistant (ML assistant)" and "Data-Centric Parallelisation (DCP)". The ML assistant project is the continuation of the work I have been doing throughout my MSc by the Research year. I have completed the project and wrapped it up in AI-SEPS 2019 workshop paper. The DCP project is at the planning stage with ongoing literature review and feasibility study. The work during the autumn months passed in 50/50 time slicing fashion between the two projects. In December I dropped DCP works and concentrated on the completion of ML assistant project. I completed the technical work on ML assistant project by the end of March. I am doing reporting and writing since then, as well as preparing the ground for the continuation of DCP project.
+\chapter{$2^{nd}$ Year Timeline}
+\quad This chapter describes all activities I have been doing during the $2^{nd}$ year of my PhD. Section \ref{active_timeline} maps them onto the year's timeline. Section \ref{active_description} gives detailed descriptions. Throughout the year I have been working withing the two projects: "Machine Learning Based Software Parallelisation Assistant (ML assistant)" and "Data-Centric Parallelisation (DCP)". The ML assistant project is the continuation of the work I have been doing throughout my MSc by the Research year. I have completed the project and wrapped it up in AI-SEPS 2019 workshop paper. The DCP project is at the planning stage with ongoing literature review and feasibility study. The work during the autumn months passed in 50/50 time slicing fashion between the two projects. In December I dropped DCP works and concentrated on the completion of ML assistant project. I completed the technical work on ML assistant project by the end of March. I am doing reporting and writing since then, as well as preparing the ground for the continuation of DCP project.
    
 \section{The Timeline of My First Year 0Activities}
 \label{active_timeline}
 \begin{description}[style=nextline]
-\item [Sep (DCP project background reading)]\hfill
+\item [Sep (Annual Review and AI-SEPS2019 presentations)]\hfill
 \begin{itemize}
 %\renewcommand\labelitemi{$\vartriangleright$}
 \renewcommand\labelitemi{$\bullet$}
-\item "Data-Centric Parallelisation" reading
-\item SPEC CPU2006 study
+\item $1^{st}$ Year Review Presentation and Meeting 
+\item AI-SEPS 2019 visa paperwork
+\item Work on AI-SEPS 2019 presentation
 \end{itemize}
-\item [Oct-Nov (50/50\%: DCP SPEC CPU2006 feasibility study +\\\ SNU NPB ICC optimisation reports parsing and study)]\hfill
+\item [Oct (AI-SEPS 2019 workshop)]\hfill
 \begin{itemize}
 %\renewcommand\labelitemi{$\vartriangleright$}
 \renewcommand\labelitemi{$\bullet$}
-\item Intel C/C++ Compiler optimisation report parser
-\item NAS benchmarks study
-\item SPEC CPU2006 study
+\item Work on AI-SEPS 2019 presentation
+\item Travel planning and paperwork 
+\item Attending AI-SEPS 2019 workshop
 \end{itemize}
-\item [Dec (ML assistant feature engineering)]\hfill
+\item [Nov (Olden benchmarks study)]\hfill
+\begin{itemize}
+%\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemi{$\bullet$}
+\item Writing documents on Olden benchmarks 
+\item Studying the source code of Olden benchmarks (mst, tsp, perimeter, health, power, treeadd)
+\end{itemize}
+\item [Dec (LibTooling reading and writing toy examples)]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
-\item Intel C/C++ Compiler optimisation report parser
-\item Feature engineering
-\item First assistant scheme assessment
-\item PPar lunch talk preparation
+\item Reading on Clang LLVM and LibTooling
+\item Writing and compiling toy examples with arrays and linked-lists
+\item Studying the source code of Olden benchmarks (mst, tsp, perimeter, health, power, treeadd)
+\item Christmas break
 \end{itemize}
-\item [Jan (ML assistant feature engineering)]\hfill
+\item [Jan (The idea of the Fractal)]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
-\item Feature engineering
-\item First assistant scheme assessment
-\item PPar lunch talk preparation
+\item Developed and designed a Fractal class template
+\item Rewrote health benchmark with the Fractal template and got 20\% performance improvement
 \end{itemize}
 \item [Feb (ML assistant train/test methodology debugging and tuning)]\hfill
 \begin{itemize}
