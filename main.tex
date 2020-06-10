@@ -161,9 +161,10 @@ In January I have rewritten the health benchmark with the first
 \item Second Year Report writing
 \end{itemize}
 \end{description}
-\section{Detailed Description of Activities}
-\label{active_description}
 
+
+\section{Description of Activities}
+\label{active_description}
 \subsection{Machine Learning Related Tasks}
 \quad The machine learning (ML) task solved withing the project of ML assistant can be presented as \textbf{supervised ML classification problem}: \textit{create an ML model of loop parallelisability and train it to classify loops of Seoul National University implementation \cite{snu-npb-benchmarks} of NAS Parallel Benchmarks \cite{nasa-parallel-benchmarks} as parallelisable or not}. The task of ML model creation can be subdivided into 5 sub tasks:
 \begin{itemize}
@@ -176,47 +177,21 @@ In January I have rewritten the health benchmark with the first
 \end{itemize}
 \quad The tasks are interdependent and cannot be solved in isolation from each other. The process had to be repeated over and over until satisfactory (above 90\%) ML model predictive performance has been achieved.
 
-\paragraph{Data set study: insight into the sources of SNU NAS Parallel Benchmarks}
-All works withing the project have been accompanied by the ongoing insight into the sources of SNU NAS Parallel Benchmarks (SNU NPB) conducted from the angle of loop parallelisability. The benchmarks have been compiled with Intel C/C++ Compiler (ICC) in order to produce its optimisation (including parallelisation and vectorisation) reports. The reports have been matched against the source code and examined manually. That helped in understanding of what kind of loops constitute SNU NPB suite, capabilities of ICC compiler in its parallelisation and the problems ICC faces. ICC manages to discover only 86\% of all parallelisable loops present in SNU NPB. We classified the remaining cases into different buckets explaining what exactly makes ICC fail. The paper we have written \cite{aiseps} contains a detailed report. There are numerous documents in the project repository \cite{github-ppar-tool} describing SNU NPB suite. Here we present just a brief summary.\newline\null
-\quad SNU NPB benchmark suite consists of 9 benchmarks. The nature of different SNU NPB benchmarks varies. Benchmarks BT, LU and SP form a cluster and perform basically the same computation. Loops withing these benchmarks work on multidimensional arrays, are highly parallelisable (some need function inlining to be done upfront) and resemble each other. But the whole performance of these benchmarks is concentrated in 3 (out of ~190) big and complex loops. ICC cannot conduct such a coarse-grain parallelisation and does not accelerate these benchmarks. CG benchmark contains simple loops and reductions. DC benchmark is a very hard to parallelise one. DC contains loops, where it is hard to compute iteration count before executing them, as well as \textit{while} loops with unidentifiable control variables, loops, which contain irregular memory loads and stores to arrays and loops with multiple exits. SNU NPB expert developers extract performance out of DC benchmark by parallelising a single section of the source code. Neither compiler, not ML assistant can do that. IS benchmark has a very similar nature and performance comes here from the parallelisation of source code section. Thus, our ML assistant is not applicable to DC and IS benchmarks. Majority of UA benchmark loops contain entangled control flow, indirect memory references and numerous function calls. The benchmark is incredibly hard to parallelise. Parallelisation requires either an expert benchmark knowledge or runtime information.
+\paragraph{Olden benchmarks study}
 
-\paragraph{Obtaining loop classification labels}
-The quality and precision of loop classification labels seem to have a direct effect on the predictive performance of our ML model. In order to gather the final set of loop classification labels for all 1415 loops of SNU NAS Parallel Benchmarks we had to use 3 methods:
-\begin{itemize}
-\renewcommand\labelitemi{$\bullet$}
-\item OpenMP \textit{#pragmas} source code extraction script
-\item Intel C/C++ Compiler (ICC) optimisation report parser \cite{github-icc-parser}
-\item Manual SNU NPB examination and verification of labelled loops
-\end{itemize}
-The task of obtaining loop parallelisability classification labels for SNU NPB has already been conducted during my MSc by Research year, but there were certain deficiencies in it. First, I used only ICC optimisation reports (without human added OpenMP pragmas available in SNU NPB) for loop labels. While ICC labels precisely and conservatively capture static program dependencies, they miss a lot of opportunities. If we use ICC labels as the only source on parallelisability of program loops our trained model will be inherently limited in its capabilities and is not expected to perfrom any better than ICC itself. Second, Intel Compiler is quite diverse in its treatment of program loops. It does not simply parallelise or vectorise the loop, but applies a lot of different enabling loop transformations and optimisations before the actual parallelisation happens. Among those are loop interchange, distribution, fusion, tiling, collapsing (see \cite{Bacon:1994:CTH:197405.197406}). ICC may distribute a loop nest into several parts and parallelise only some of them. Loop nests might end up being completely restructured and spread throughout the whole ICC optimisation report. Several levels deep function inlining introduces additional difficulties. These effects complicate not only the technical extraction of information out of ICC reports, but the definition of loop parallelisability itself. We consider a loop as being parallelisable if ICC has not found any dependencies in it and either vectorised or parallelised it. In the case of loop distributions we act in a recursive fashion and consider a loop to be parallelisable if and only if all its constituent parts are parallelisable themselves. Some of the issues persisted even after ICC optimisation report parser has been significantly elaborated redesigned and rewritten a couple of times and we had to verify our results manually on top of all. All these difficulties have been skipped during my MSc by Research due to the time constraints and as a result we had managed to approximate (with the help of simplified Bash scripts) classifications for \~1260 loops only. The remaining 1415-1260=155 loops had broken our script and managed to escape our grasp. But this difference of 155 loops seems to be the most interesting as these represent the most complicated SNU NPB loops being tackled by the ICC and hence potentially capable of giving us the most precious insight into the parallelisability of loops. While OpenMP pragmas source code extraction task boils down to a simple 20 LOC (Lines Of Code) Bash script, the development of ICC optimisation report parser resulted into a tool \cite{github-icc-parser} of approximately 2000 Python LOC.
+\quad Olden benchmark suite consists of 9 benchmarks. 
+I have looked at 5 of those (health, perimeter, treeadd, mst and tsp benchmarks).
 
-\paragraph{Feature engineering}
-The feature engineering efforts conducted during my first year have increased the size of the feature set from 16 to 74 metrics. The latter brought an accuracy of our ML model up from 77\% to above 90\%. As an LLVM-based PPar tool \cite{github-ppar-tool} building Program Dependence Graph (PDGs) \cite{Ferrante:1987:PDG:24039.24041} and performing an iterator recognition analysis \cite{Manilov:2018:GPI:3178372.3179511} on it has already been developed during my MSc by Research year, the addition of new loop features became a relatively straightforward task. In order to add a new feature to our ML model one needs to perform the following steps: 
-\begin{itemize}
-\renewcommand\labelitemi{$\bullet$}
-\item Implement a feature computing LLVM pass using developed during MSc by Research C/C++ templates \cite{github-ppar-tool}
-\item Run a newly developed LLVM pass on toy examples in the playground folder and manually verify its correctness with the help of DOT printed graphs 
-\item Run feature computing passes of PPar tool on SNU NPB benchmarks and update an excel table with a new feature
-\item Run ML train/test script and get an accuracy number
-\end{itemize}
-Guided by the study of SNU NPB source code, ICC optimisation reports and DOT format visualisations of PDG graphs the above sequence has been iteratively repeated up until the point of reaching 93-94\% prediction accuracy on certain feature subsets by the means of K-fold CV. Although the reached accuracy is close to perfect, the train/test script I used to get to that point was simplistic and did not fully correspond to a standard way of setting an ML pipeline (automatic feature selection, model selection and the tuning of its hyper-parameters, different testing approaches, etc.). Moreover, I have been manually choosing different subsets of loop features in an attempt to get the best accuracy. In the task of feature engineering I just finished with the implementation of features in LLVM and the preparation of the final data set with candidate features to use.
+The nature of different Olden benchmarks varies. Benchmarks health, treeadd and perimeter perform basically the same computation. Benchmarks tsp and mst solve 2 well-known graph problems.  
 
-\paragraph{ML methodology tuning}
-Once I implemented all ML loop features and gathered the data, I moved to the task of aligning my training and testing methodology with the standard accepted one to make my results more credible. As the one who does not possess a significant ML background I used a practical hands-on approach in an attempt to get the final results faster. I read scikit-learn library \cite{scikit-learn} documentation on different stages of ML pipelines and developed a Python scripting framework, which can be used for conduction of different ML train/test experiments with a range of varying parameters. As I moved from my simplified ML scripts I used during feature engineering task onto a more consistent train/test methodology my newly developed scripting framework offered, the accuracy dropped from 93-94\% down to 84-87\% and I had to repeatedly tune my ML pipeline by trying out different ML models (SVC, Neural Networks, Decision Trees, etc.) and pipeline configurations to get back to above 90\% accuracy. Every new configuration and model to try required an extension of the scripting framework, which eventually resulted into 2900 Python LOC in total. The scripting framework is configured with INI files provided as input. INI files specify the exact parameters on every ML pipeline stage. For example, SVC pipeline has been configured in the following way. First, apply standard scaler to preprocess feature values and get them to the same centered range. Then apply a sequence of automatic feature selection steps (Low Variance Filter, fit DT model and select features with highest importance scores, run RFECV twice maximizing precision and then accuracy scores). After that we select the best set of hyper-parameters of SVM by running GridSearchCV several times and searching the chosen grid of hyper-parameters. At last we run our training and testing experiments and do reporting. Scripting framework included the code I used to report on different ML assistant schemes I estimated as well.
+Loops withing these benchmarks work on multidimensional arrays, are highly parallelisable (some need function inlining to be done upfront) and resemble each other. 
 
-\subsection{Parallelisation Assistant: Design and Assessment}
+Parallelisability?
 
-\paragraph{First assistant scheme assessment}
-ML train/test scripting framework has been extended to report on ICC competition scheme described in the paper \cite{aiseps}. Scripting framework does K-Fold CV and calculates the distribution of ICC/Predictor/TrueParallelisability cases along with some other statistics. The scheme assesses predictor's capabilities in extending the amount of true parallelism ICC finds in SNU NPB.
-
-\paragraph{Second assistant scheme assessment}
-\quad In order to assess the final scheme of ML based assistant I had to choose the function I am going to use to combine loop runtime and its ML model reported parallelisability. After that I received rankings for all SNU NPB benchmark loops. Loops have been ordered by their running time and by assistant advised order as well. The task of assessment the effectiveness and utility of our assistant boiled down to partially parallelising SNU NPB benchmarks loop by loop and getting their speedups. The task was tedious and manual. It took around a month to get all performance data for all ML models (SVC, RFC, DT, MLP, AdaBoost). I have been doing it by commenting and uncommenting OpenMP pragmas and running the benchmarks on my DICE machine. As a result I plotted performance convcergence curves, which can be found in the paper \cite{aiseps}.  
+\paragraph{Computational Frameworks library development}
 
 \subsection{"Data-Centric Parallelisation" project}
 \quad The report on DCP project activities is given in a form of DCP project literature review and the feasibility study of 429.mcf, 400.perlbench, 456.hmmer, 470.lbm benchmarks in DCP chapter.
-
-
-
 
 \chapter{Computational Frameworks}
 
