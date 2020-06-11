@@ -19,7 +19,7 @@
 
 \addbibresource{main.bib}
 
-\title{\centering \textbf{Second Year Review\thanks{Progress report and PhD vision}}\\Towards Alleviating The Task of Software Parallelization}
+\title{\centering \textbf{Second Year Review\thanks{Progress report and thesis vision}}\\Towards Alleviating The Task of Software Parallelization}
 \author{Aleksandr Maramzin\\s1736883}
 \date{June 2020}
 
@@ -70,8 +70,17 @@
 \quad The second tool we want to add to our software parallelisation toolkit solution is aimed at addressing the problem of unsuccessful data structure choice, which might turn a perfectly parallelisable at a higher level computation into a non-parallelisable lower level implementation. The tool is at the literature review and feasibility study stage.
 \end{abstract}
 
-\chapter{PhD Vision}
-\quad The problem of software parallelisation is multifaceted. A perfectly parallelisable at a higher level algorithm might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap allocated pointer linked data structures, indirect array referencing, etc. Compilers are usually powerless in front of such challenges and manual parallelisation is required. But the latter is hard and requires of programmers extra skills. My PhD task is to alleviate the manual parallelisation process.\newline\null    
+\chapter{Thesis Vision\\{\Large Research Path}}
+\quad In our work we address the problem of software parallelization. The problem is multifaceted and complex: a perfectly parallelizable at a higher level algorithm might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. These constructs are quite common in legacy code bases. Parallelizing compilers usually fail to  
+
+present parallelizing compiler with grand challenges appear quite often  present automatically  
+
+Effective in the specific domains and with certain codes automatically parallelizing compilers are powerless in front of major real life challenges. Manual parallelisation is required. 
+
+But the latter is hard and requires of programmers extra skills. My PhD task is to alleviate the manual parallelisation process.\newline\null
+
+
+
 \quad My PhD studies go into the direction of software parallelisation assistance. The work started during my MSc by Research year with an idea of "Software Metrics for Parallelism". The idea was based on the similar work in the field of software quality metrics. Cyclomatic complexity (CC) software metric might be taken as an illustrative example, which quantitatively characterizes the difficulty of program comprehension. The idea of "Software Metrics for Parallelism" has passed through several stages of lost and revived interest. As we implemented our parallelisability metrics inside LLVM and finally got to see their behaviour on SNU NPB benchmark suite, we observed the weakness of metrics correlation with software parallelisability property. That was right at the end of my MSc by the Research. Then we decided to use the metrics as machine learning features and created a model of loop parallelisability. The predictive accuracy was initially low causing us to doubt in learnability of that property for SNU NPB suite. It took us a while before we managed to get an acceptable above 90\% level. At this point we realized that it is not enough to just learn loop parallelisability property. We developed an assistant scheme extending Intel Compiler's parallelism discovery capabilities. But parallelisability does not necessarily materialize into actual performance improvements. We had to create a crafty scheme taking an application profile and using ML model to ultimately point the best loops to concentrate a programmer efforts on. All that resulted into an end-to-end tool assisting a programmer by providing the latter with the best loop ranking to start parallelisation with.\newline\null
 \quad But the tool we developed is just a piece in a final solution package we aim to get. The next step would be to tackle the problem of heap allocated pointer linked data structures. At least we would like to develop a tool capable of their recognition (is it a tree or a linked list?, etc). As the literature review section of DCP project and SPEC CPU2006 feasibility studies show, static methods (such as shape analysis o
 r Idiom Description Language (IDL) based on a constraint solver) are unlikely to recognize data structures of SPEC CPU complexity level. We need to use dynamic techniques, which would recreate a dynamic model of data structure heap layout. Vast array of recent work in that direction proves that feeling.    
@@ -152,16 +161,17 @@ In January I have rewritten the health benchmark with the first
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item Thesis writing
-\item 
+\item [Reading] Software architecture design patterns
+\item Work on the library as the whole
 \end{itemize}
 \item [Jun (Second Year Report Writing)]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item Thesis writing
 \item Second Year Report writing
+\item Work on the library as the whole
 \end{itemize}
 \end{description}
-
 
 \section{Description of Activities}
 \label{active_description}
@@ -178,9 +188,20 @@ In January I have rewritten the health benchmark with the first
 \quad The tasks are interdependent and cannot be solved in isolation from each other. The process had to be repeated over and over until satisfactory (above 90\%) ML model predictive performance has been achieved.
 
 \paragraph{Olden benchmarks study}
+\quad 
 
-\quad Olden benchmark suite consists of 9 benchmarks. 
-I have looked at 5 of those (health, perimeter, treeadd, mst and tsp benchmarks).
+
+\quad Olden benchmark suite consists of 10 benchmarks. 
+I have looked at 6 of those (bisort, health, perimeter, treeadd, mst and tsp benchmarks). 
+
+\quad In order to prepare the ground for the excavation of data structures in the legacy code bases and source code rejuvenation we started with a study of a well-known SPEC CPU2006 benchmarks.   
+
+
+we conducted a study of SPEC CPU2006 benchmarks. We examined the data structures used withing benchmark hotspots. The motivation behind this is that it is not enough to just recognise the data structures. Having done so, ideally we would need to replace them with faster versions and get performance improvements.
+
+We have learnt several lessons out of our study 
+
+
 
 The nature of different Olden benchmarks varies. Benchmarks health, treeadd and perimeter perform basically the same computation. Benchmarks tsp and mst solve 2 well-known graph problems.  
 
@@ -349,37 +370,6 @@ class Framework {
 
 \section{Performance of the library}
 \quad We have rewritten old legacy C implementations of 4 Olden benchmarks: health, perimeter, treeadd and power. The table below shows the performance gains our versions have over old sequential implementations.
-
-\chapter{"Data-Centric Parallelisation"}
-\label{chapter_dcp}
-\quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
-\begin{minipage}[t]{0.45\linewidth}
-\begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
-for (int i=0; i<n; it++) {
-  a[i]=a[i]+1;
-}
-\end{lstlisting}
-\end{minipage}
-%
-\begin{minipage}[t]{0.55\linewidth}
-\begin{lstlisting}[caption={Non-parallelisable loop operating on a \textbf{linked-list}.},label={lst:list},language=C]
-for (p=list; p!=NULL; p=p->next) {
-  p->value+=1;
-}
-\end{lstlisting}
-\end{minipage}
-\quad Listings \ref{lst:array} and \ref{lst:list} illustrate two alternative implementations of the same simple computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelisability.\newline\null
-\quad In the project of "Data-Centric Parallelisation (DCP)" we would like to automatically recognise 
-
-\section{Literature Review}
-\label{dcp_literature_review}
-\quad The idea of automatic discovery of higher level entities in programs is not a new one. This discovery problem is closely interlinked and entangled with alias analysis techniques \cite{Muchnick:1998:ACD:286076} like points-to analysis \cite{Emami:1994:CIP:178243.178264}. Points-to analysis is a variation on data flow analysis techniques. The final output is the sets of pairs of the form (\textit{p},\textit{x}) (pointer variable \textit{p} points to a stack allocated variable \textit{x}). These techniques are aimed at getting aliasing information regarding stack-allocated pointers.\newline\null
-\quad The problem of understanding heap-directed pointers and heap-allocated linked data structures these pointers might point to is addressed with a family of static analysis techniques collectively known as shape analysis. Shape analysis techniques can be used to verify properties of dynamically allocated data structures in compile time. These are among the oldest and most well known techniques. Three-valued logic \cite{Sagiv:1999:PSA:292540.292552}\cite{Wilhelm:2000:SA:647476.760384} can be used as an example. The technique proposes a construction of a mathematical model consisting of logical predicate expressions. The latter correspond to certain pointer operating imperative language program statements. Abstract interpretation of these statements leads to a construction of sets of shape graphs at various program points. Shape graphs approximate the possible states of heap-allocated linked data structures and answer the questions such as node reachability, data structure disjointness, cyclicity, etc. The major limitation of these simplified mathematical models is the lack of precision high level of abstraction leads to. The problem of precise shape analysis is provably undecidable.\newline\null
-\quad The work of \cite{Ghiya:1996:TDC:237721.237724} proposes a simplified and hence more practical implementation of shape analysis. Authors propose to use direction \textit{D} and interference \textit{I} matrices instead of complex mathematical models in order to derive shape information on heap allocated data structures. The entry of direction matrix \textit{D[p,q]} says if there exists a path from a node referred to by \textit{p} to a node referred to by q. In other words, if we can enter a path withing the data structure through \textit{p} and exit through \textit{q}. The entry of interference matrix \textit{I[p,q]} says if the paths started from \textit{p} and \textit{q} are going to intersect at some point. Authors implement their technique withing McCAT compiler, which uses SIMPLE intermediate representation with a total of 8 statements (\textit{malloc()}, pointer assignments \textit{p=q}, structure updates \textit{p-$>$next=q}), which are capable of changing \textit{D} and \textit{I} matrices. Statements generate and kill entries in matrices. Moreover, they are capable of changing \textit{Shape} attribute of pointers. The technique has been assessed on various benchmarks (bintree, xref, chomp, assembler, loader, sparse, etc.) from the era before the standard benchmark suites became available. The technique mostly reported shapes as \textit{Trees} (be it a binary tree or a linked-list) or sometimes as \textit{DAGs} or \textit{Cycles} but with higher error rates in these last cases. The latter shows that the technique is imprecise and conservative.\newline\null
-\quad One of the more recent techniques designed and developed by Philip Ginsbach and Michael F. P. O’Boyle is based on the pattern matching on LLVM IR level. The main idea is to specify computational idioms to be recognized in a domain specific constraint based programming language CAnDL \cite{Ginsbach:2018:CDS:3178372.3179515}. Constraints are specified over LLVM IR entities such as instructions, basic blocks, functions, etc. The CAnDL language allows for a rapid prototyping of new compiler optimisations based on pattern recognition and its substitution with an optimised versions of matched idioms. The language and its relatively fast backtracking constraint solver are capable of recognizing not only simple arithmetic idioms (thus performing different peephole optimizations), but more complex computations like general reductions and histograms \cite{Ginsbach:2017:DEG:3049832.3049862}, vector products in graphics shaders \cite{Ginsbach:2018:AML:3296957.3173182}, sparse and dense linear algebra computations and stencils \cite{Ginsbach:2018:AML:3296957.3173182}. Having recognized these computational idioms the work \cite{Ginsbach:2018:AML:3296957.3173182} replaces them with a code for various heterogeneous APIs (MKL, libSPMV, Halide, clBLAS, CLBlast, Lift) and compares the resulting performance demonstrating an improvement over sequential versions and matching performance to a hand-written parallel versions. The technique has been deployed on the sequential C versions of SNU NPB, the C versions of Parboil and the OpenMP C/C++ versions of Rodinia demonstrating an improved detection capabilities over the state-of-the-art techniques.\newline\null
-\quad The other principally different technique has been recently proposed by Changhee Jung and Nathan Clark \cite{1669122}. The authors developed a Data-structure Detection Tool (DDT) based on LLVM framework. The tool instruments loads, stores and calls withing program binaries and gathers dynamic traces for sample inputs. The traces are used to recreate a memory allocation graph for program data structures. Call graphs are used to identify interface functions interacting with the built memory graph. DDT traces memory graph properties (number of nodes, edges, etc.) before and after interface function calls into another Daikon tool to compute dynamic invariants (the number of nodes in a memory graph decreses by 1 after every \textit(delete()) interface method call, etc.). At the end manually constructed decision tree is used to probabilistically match observed behavioral patterns against known data structure invariant properties. The technique has been deployed to recognise data structure implementations withing standard libraries like STL, Apache (STDCXX), Borland (STLport), GLib, Trimaran achieving almost perfect recognition accuracy. Moreover, the technique has been able to recognise linked lists in Em3d and Bh Olden benchmarks, along with red-black trees implementing vectors in Xalancbmk benchmark.\newline\null
-\quad There has recently been other published works on the application of dynamic techniques to the problem of dynamic data structure recognition \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}. The technique used in the DDT tool \cite{1669122} makes an assumption, that all modifications and interactions with memory graphs representing data structures happen through a set of interface functions. That is not true, when we deal with aggressively optimising compilers, which may eliminate some code or inline some functions. The MemPick tool \cite{Haller:2016:SDS:2938006.2938029} searches data structures directly on a built dynamic memory graph by analyzing its shape. The graph is built with the help of Intel Pin binary instrumentation tool during quiescent periods, when pointer operations are absent. DSIbin tool \cite{Rupprecht:2017:DID:3155562.3155607} operates with the source code rather than program binaries. Instead of memory points-to graphs it uses strands as primitives, which abstract such entities as singly-linked lists.\newline\null
-\quad The work of Dekker \cite{Dekker:1994:ADS:3107859.3107876} addresses software design recovery problem in a completely different way. Contrary to the approaches described above, which operate on the IR and dynamic instruction stream levels, work of Dekker operates at the level of abstract syntax tree. Dekker's tool tries to compact the tree down to a recognizable syntactic patterns by transforming it in accordance to a special grammar.
 
 \section{SPEC CPU2006 Feasibility Study}
 \quad In order to find the ground for the excavation of data structures we conducted a study of SPEC CPU2006 benchmarks. We examined the data structures used withing benchmark hotspots. The motivation behind this is that it is not enough to just recognise the data structures. Having done so, ideally we would need to replace them with faster versions and get performance improvements. On my side I've looked into \textit{429.mcf}, \textit{400.perlbench}, \textit{456.hmmer} and \textit{470.lbm} benchmarks. Paragraphs below present a quick summary.
