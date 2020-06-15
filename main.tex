@@ -60,10 +60,10 @@
 
 \begin{abstract}
 
-% Problem: the need for manual parallelisation has not yet gone away, despite decades of work automatic parallelisation tools do not deliver desired performance improvements
+% Problem: the need for manual parallelization has not yet gone away, despite decades of work automatic parallelization tools do not deliver desired performance improvements
 
-\quad Parallel hardware has become ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion: be it an old legacy software initially designed to run on the available at that time serial hardware or modern applications being developed by application domain experts rather than performance engineers. In order to exploit all available hardware facilities software has to be parallelised.\newline\null
-\quad The problem of software parallelisation is multifaceted and requires of programmers to possess an additional (apart from their application domain expertise) knowledge in various domains of parallel programming (from cache coherence protocols to high level algorithmic skeletons). For decades researches and engineers have been working on automatic parallelisation techniques, which are supposed to ultimately liberate programmers from the challenging task of manual parallelisation. But, despite the massive body of work on the subject, automatic techniques still cannot deliver performance levels expert programmers reach and are limited to narrow domains of scientific Fortran codes and relatively simple computational idioms.\newline\null
+\quad Parallel hardware has become ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion: be it an old legacy software initially designed to run on the available at that time serial hardware or modern applications being developed by application domain experts rather than performance engineers. In order to exploit all available hardware facilities software has to be parallelized.\newline\null
+\quad The problem of software parallelization is extremely complex and multifaceted and requires of programmers to possess an additional (apart from their application domain expertise) knowledge in various domains of parallel programming (from cache coherence protocols to high level algorithmic skeletons). For decades researches and engineers have been working on automatic parallelization techniques, which are supposed to ultimately liberate programmers from the challenging task of manual parallelisation. But, despite the massive body of work on the subject, automatic techniques still cannot deliver performance levels expert programmers reach and are limited to narrow domains of scientific Fortran codes and relatively simple computational idioms.\newline\null
 \quad Given the difficulty of the obstacles faced by automatic parallelisation today, we do not expect a breakthrough in the area or a "silver bullet" solving the problem in the near future. We acknowledge the role of a human expert, but at the same time we propose an assistant solution, which can be used to guide programmer's efforts and alleviate the manual parallelisation task.\newline\null
 \quad The assistant solution we propose is as multifaceted as the problem itself and consists of several components aimed to tackle different aspects of software parallelisability. It is a toolkit rather than a single tool. The first tool in the toolkit has been designed, developed and assessed during the first year of my PhD. Complementary tools are supposed to be developed over the course of remaining time.\newline\null
 \quad The designed tool is basically a machine learning (ML) based model of loop parallelisability integrated and utilised into an assistant scheme. Assistant takes an application to be parallelised along with its profile as an input and presents a programmer with a ranking of application loops. In contrast to a profile guided approach, assistant's ranking highlights application loops, which are not only long-running (and thus potentially profitable), but crucially parallelisable. This way a programmer concentrates his efforts on promising application loops and converges to the best achievable performance faster. We have deployed our assistant on SNU NAS Parallel Benchmarks \cite{snu-npb-benchmarks} \cite{nasa-parallel-benchmarks} and demonstrated a potential of our idea \cite{aiseps}.\newline\null
@@ -71,7 +71,7 @@
 \end{abstract}
 
 \chapter{Thesis Vision\\{\Large Research Path}}
-\quad In our work we address the problem of software parallelization. The problem is multifaceted and complex: a perfectly parallelizable at a higher level algorithm might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. These constructs are quite common in legacy code bases. Parallelizing compilers usually fail to  
+\quad In our work we address the problem of software parallelization. The problem is multifaceted and complex: a perfectly parallelizable at a higher level algorithm might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. These constructs are quite common in legacy code bases. Parallelizing compilers usually fail to deal with such challenges.   
 
 present parallelizing compiler with grand challenges appear quite often  present automatically  
 
@@ -175,20 +175,20 @@ In January I have rewritten the health benchmark with the first
 
 \section{Description of Activities}
 \label{active_description}
-\subsection{Machine Learning Related Tasks}
 \quad The machine learning (ML) task solved withing the project of ML assistant can be presented as \textbf{supervised ML classification problem}: \textit{create an ML model of loop parallelisability and train it to classify loops of Seoul National University implementation \cite{snu-npb-benchmarks} of NAS Parallel Benchmarks \cite{nasa-parallel-benchmarks} as parallelisable or not}. The task of ML model creation can be subdivided into 5 sub tasks:
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
-\item Data set (SNU NAS Parallel Benchmarks) study
-\item Obtaining loop classification labels for SNU NPB
-\item Loop feature engineering
-\item Loop feature extraction
-\item ML train/test methodology tuning
+\item Olden benchmarks study
+\item Computational frameworks library design
+\item Olden benchmarks rewriting
+\item Thesis writing
 \end{itemize}
-\quad The tasks are interdependent and cannot be solved in isolation from each other. The process had to be repeated over and over until satisfactory (above 90\%) ML model predictive performance has been achieved.
+\quad All above tasks are interdependent and happened iteratively and in close cooperation with one another. The process had to be repeated over and over until satisfactory (above 90\%) ML model predictive performance has been achieved.
 
-\paragraph{Olden benchmarks study}
+\subsection{Olden benchmarks study}
 \quad 
+
+
 
 
 \quad Olden benchmark suite consists of 10 benchmarks. 
@@ -208,6 +208,30 @@ The nature of different Olden benchmarks varies. Benchmarks health, treeadd and 
 Loops withing these benchmarks work on multidimensional arrays, are highly parallelisable (some need function inlining to be done upfront) and resemble each other. 
 
 Parallelisability?
+
+\paragraph{bisort}
+\textit{\textbf{Definition} A sorted sequence is a monotonically non-decreasing (or non-increasing) sequence. A bitonic sequence is a sequence with $x_{0} \leq ... \leq x_{k} \geq ... \geq x_{n}−1$ for some k, or a circular shift of such a sequence.}\newline\null
+\quad The sequence is based on a binary tree implementation (recursive calls to left and right subtrees). The algorithm is based on a sorting comparator network consisting of several layers. The network can be and is implemented in a divide and conquer way similar to that of a well-known merge sort. Sort() function is called on the left and right array halves recursively. The merging step of the merge sort algorithm is substituted with compare-and-swap step. The latter is possible due to input sequences required to be bitonic.
+\quad\textbf{The benchmark is heavily based on pointers, tree swaps and rotations. It presents an interest from the point of divide and conquer algorithm recognition. Static techniques are unlikely to handle the legacy source code of that complexity and style. Dynamic techniques sould be able to see the binary tree.}      
+
+\paragraph{health} The most promising of all Olden benchmarks. Columbian health care system simulation is based on a complete 4-ary tree of $4^{max_level}$ adjacent villages. Each village has its own hospital and is connected to 4 adjacent child villages. Simulation starts from the top (tree root village and goes down all the tree branches recursively right to left.
+Every simulation step consists of several events:
+1) Accept all patients from adjacent villages and put them in the local hospital for an initial assessment and possibly for further hospitalization inside the local hospital. 
+2) Check patients who are inside the local hospital: once inside patients spend time to recover and occupy 1 member of the staff throughout all time. If time have passed then the patient is checked out and releases 1 personnel member.
+3) Check patients on the assessment list. Patients require some time to be diagnosed. Each patient occupies 1 member of the staff throughout the whole assessment process. If patient is ill then he continues to occupy the same personnel member and goes inside the hospital. If patient is healthy the the patient is checked out and releases 1 staff member.
+4) Check patients on the waiting list. Once a patient gets into the hospital he/she takes on 1 member of the staff if the personnel is
+available. If not, then the patient goes onto the waiting list. Patient passes through 2 phases: assessment and hospitalisation. Each patient is being supervised by 1 member of the personnel starting from assessment and up until checking out of the hospital. If after assessment a patient turns out to be healthy then the patient is checked out and a personnel member is returned back to available pool. If patient is confirmed ill, then the former is put inside the hospital and spends time there. Patients fall ill at the will of a random number generator. 
+\quad The benchmark operates with quad tree structures and does it in a highly parallel fashion. In our work we call that pattern a fractal. The latter is a computational framework, i.e. the blend of an algorithm and a data structure. The whole structure can be aimed at for an automatic recognition (not just a separate tree or an algorithmic skeleton, but both) even with static techniques.
+
+\paragraph{perimeter} The benchmark computes the perimeter of a ring (R=2048, r=1024). The ring is mapped onto a grid of elements by painting all the grid elements inside the ring ($r \lt x*x+y*y \lt R$) as black and all grid elements outside of it as white. Then the grid is being traversed in two different (implementation dependent) ways and detects all flips of color (black to white and vice versa) to sum them up into the final perimeter approximation. The grid is implemented as a quad tree based fractal. The initial square is split into 4 parts (northwest, northeast, southwest, southeast), which in their turn split further on. The process reminds the fractal framework from the health benchmark.    
+
+\paragraph{power}
+
+\paragraph{treeadd}
+
+\paragraph{mst}
+
+\paragraph{tsp}
 
 \paragraph{Computational Frameworks library development}
 
