@@ -175,7 +175,23 @@ In January I have rewritten the health benchmark with the first
 
 \section{Description of Activities}
 \label{active_description}
-\quad The machine learning (ML) task solved withing the project of ML assistant can be presented as \textbf{supervised ML classification problem}: \textit{create an ML model of loop parallelisability and train it to classify loops of Seoul National University implementation \cite{snu-npb-benchmarks} of NAS Parallel Benchmarks \cite{nasa-parallel-benchmarks} as parallelisable or not}. The task of ML model creation can be subdivided into 5 sub tasks:
+\quad The second year of my PhD was a continuation with the "Data-Centric Parallelization (DCP)" project. To work towards the recognition of data structures in legacy codes one would need to find the ground for that. In the previous year we conducted a feasibility study on some of the SPEC CPU2006 benchmarks and we learnt several things.       
+
+\begin{description}[style=nextline]
+\item [Research interest] Some of the SPEC CPU2006 benchmarks present an interest from the point of data structure and algorithmic skeleton recognition. For example, 429.mcf benchmark works with dynamic pointer-linked data structure. Benchmarks \hfill
+\item [Real world legacy code complexity] SPEC CPU2006 benchmarks have proved to be extremely complex. For example, 429.mcf benchmark operates with a network of nodes and arcs laid out linearly in the heap memory. Despite simplicity of  allocation every node and arc structure has numerous pointers, which span several object linking chains. Operations with the data structure are spread all around the benchmark. It is extremely complex to grasp an algorithm and all the data structure details even by the means of manual source code study. Application of static techniques seems infeasible, while application of dynamic techniques is extremely complex.    
+
+
+
+
+\hfill
+\item [Close relationship between algorithms and data structures]\hfill
+\item []\hfill
+
+\end{description}
+
+
+The machine learning (ML) task solved withing the project of ML assistant can be presented as \textbf{supervised ML classification problem}: \textit{create an ML model of loop parallelisability and train it to classify loops of Seoul National University implementation \cite{snu-npb-benchmarks} of NAS Parallel Benchmarks \cite{nasa-parallel-benchmarks} as parallelisable or not}. The task of ML model creation can be subdivided into 5 sub tasks:
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item Olden benchmarks study
@@ -223,15 +239,47 @@ Every simulation step consists of several events:
 available. If not, then the patient goes onto the waiting list. Patient passes through 2 phases: assessment and hospitalisation. Each patient is being supervised by 1 member of the personnel starting from assessment and up until checking out of the hospital. If after assessment a patient turns out to be healthy then the patient is checked out and a personnel member is returned back to available pool. If patient is confirmed ill, then the former is put inside the hospital and spends time there. Patients fall ill at the will of a random number generator. 
 \quad The benchmark operates with quad tree structures and does it in a highly parallel fashion. In our work we call that pattern a fractal. The latter is a computational framework, i.e. the blend of an algorithm and a data structure. The whole structure can be aimed at for an automatic recognition (not just a separate tree or an algorithmic skeleton, but both) even with static techniques.
 
-\paragraph{perimeter} The benchmark computes the perimeter of a ring (R=2048, r=1024). The ring is mapped onto a grid of elements by painting all the grid elements inside the ring ($r \lt x*x+y*y \lt R$) as black and all grid elements outside of it as white. Then the grid is being traversed in two different (implementation dependent) ways and detects all flips of color (black to white and vice versa) to sum them up into the final perimeter approximation. The grid is implemented as a quad tree based fractal. The initial square is split into 4 parts (northwest, northeast, southwest, southeast), which in their turn split further on. The process reminds the fractal framework from the health benchmark.    
+\paragraph{perimeter} The benchmark computes the perimeter of a ring (R=2048, r=1024). The ring is mapped onto a grid of elements by painting all the grid elements inside the ring ($r \lt x*x+y*y \lt R$) as black and all grid elements outside of it as white. Then the grid is being traversed in two different (implementation dependent) ways and detects all flips of color (black to white and vice versa) to sum them up into the final perimeter approximation. The grid is implemented as a quad tree based fractal. The initial square is split into 4 parts (northwest, northeast, southwest, southeast), which in their turn split further on. The process reminds the fractal framework from the health benchmark.  
 
-\paragraph{power}
+\paragraph{power} The second by importance is the power pricing computation benchmark. The benchmark is based on a composite structure of C arrays and pointer-based linked lists of various objects such as Root, Laterals, Branches and Leaves. Figure \ref{fig:power_benchmark} illustrates the data structure. The algorithm is basically composed of folds and reductions. C arrays are reduced and linked lists are folded. The algorithm works recursively and starts with the Root::compute() call. The method accumulates power demand
+Demand(P,Q) from all lists of Laterals. Accumulation starts with the end of each list. Each lateral accumulates its power demand from all its branches and the latter in turn accumulate power demand from all their leaves. The leaves call
+optimize\_node() method, which does a chunk of scientific computations (gradients, vectors, etc.), which compute P and Q. Finally, Root::compute() is called iteratively from a while
+loop of power\_pricing\_problem(). Iteration continues up until P and Q error becomes less than the required epsilon. 
+\begin{figure}[ht]
+\includegraphics[width=1.0\textwidth]{images/power_scheme.pdf}
+\caption{The Power benchmark.}
+\label{fig:power_benchmark}
+\end{figure}
 
 \paragraph{treeadd}
 
-\paragraph{mst}
+\paragraph{mst} Minimum Spanning Tree (MST) benchmark does a MST weight computation of a complete graph. Computation is approximate and the algorithm looks like it might finish with incorrect result. Nevertheless, the benchmark can be used for the purpose of computational workload. Graph is represented as a linked list of vertices. Every node in the list has a hash table of incident edges. Graph is complete: each vertex is connected to all other vertices in the graph (except itself). Algorithm repeatedly traverses the list of vertices and gradually accumulates the MST weight. On every traversal algorithm picks the node in the list to use as an input for the next traversal. In that sense, there is a cross iteration/traversal dependency. The code below summarises the benchmark.\newline\null
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={The main algorithm of mst benchmark.},label={lst:mst_code},language=C]
+vertex = list;
+list = list->next;
+while (num_vertices) {
+    ret = traverse_vertex_list(vertex, list);
+    mst_weight += ret.distance; // accumulate the final result
+    vertex = ret.vertex; // next vertex to measure the distance against
+    num_vertices--;
+}
+return mst_weight;
+\end{lstlisting}
+\end{minipage}
 
-\paragraph{tsp}
+
+\paragraph{tsp} Travelling Salesman Problem (TSP). The benchmark generates a set of dots scattered on a 2D plane. Dots represent cities and are specified by their (x,y) coordinates. The TSP problem is to visit all the cities and return to the city of origin having passed the minimal distance. In other words, the algorithm returns a cycled sequence of cities, where proximity of elements in the sequence in terms of order means their spatial proximity on the 2D plane.\newline\null
+\quad The algorithm’s work resembles that of an insertion sort. The sequence is divided into 2 parts. Ordered part and unordered part. At first, ordered part consists of just 1 element. On every iteration the algorithm takes the next element out of unordered part, finds it a pairing element inside the ordered part (with the minimal distance between them) and inserts the element into the ordered subsequence next to its pair. At the end we get the sequence with the property that closest dots stand the closest in the sequence.\newline\null
+\quad The benchmark is based on a binary tree being transformed into doubly linked list. 
+
+
+
+Computational method
+
+1) A binary tree is built. Every node of the tree represents a city located on 2D plane with randomly generated (x,y) coordinates. The build_tree() method is written in a way to generate a uniform distribution of dots on the plane.
+
+
 
 \paragraph{Computational Frameworks library development}
 
