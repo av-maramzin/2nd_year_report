@@ -175,10 +175,25 @@ In January I have rewritten the health benchmark with the first
 
 \section{Description of Activities}
 \label{active_description}
-\quad The second year of my PhD was a continuation with the "Data-Centric Parallelization (DCP)" project. To work towards the recognition of data structures in legacy codes one would need to find the ground for that. In the previous year we conducted a feasibility study on some of the SPEC CPU2006 benchmarks and we learnt several things.       
+\quad During the $2_{nd}$ year of my PhD I continued to work towards the "Data-Centric Parallelization (DCP)" project. In the previous year we conducted a feasibility study on SPEC CPU2006 benchmarks as an initial step towards the automatic data structure recognition and source code rejuvenation. That created the ground for this year's work. Looking at the real world code of SPEC CPU2006 benchmarks we have learnt some things regarding the problem we are tackling.\newline\null
+
+
+
 
 \begin{description}[style=nextline]
-\item [Research interest] Some of the SPEC CPU2006 benchmarks present an interest from the point of data structure and algorithmic skeleton recognition. For example, 429.mcf benchmark works with dynamic pointer-linked data structure. Benchmarks \hfill
+\item [Research interest] Some of the SPEC CPU2006 benchmarks present an interest from the point of data structure and algorithmic skeleton recognition. For example, 429.mcf benchmark works with dynamic pointer-linked data structure resembling some form of a spanning tree with child and sibling arcs.  Benchmark 456.hmmer searches a DNA sequence database given a Progile Hidden Markov Model (HMM). Benchmark uses Viterbi algorithm. The implementation works with four dynamic programming matrices allocated linearly as arrays. Algorithm walks either horizontally or diagonally along these matrices and computes reductions of maps. The computation is parallelisable and there has been works doing it \cite{Ganesan:2010:AHG:1854776.1854844}\cite{inria} and accelerating the benchmark on specialised hardware. The benchmark operates with matrices laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. The benchmark would be interesting from the point of algorithmic skeletons recognition, but the implementation core is extremely complex for all 
+
+Benchmark 400.perlbench is a cut-down Perl interpreter and implements a regular expression matching state machine. The main loop takes a pointer to the bit-code of compiled regular expression and processes it instruction by instruction.Although instructions have the same size and are linearly laid out in the memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. Riddled with goto jumps this code requires sequential execution and is beyond the capabilities of any surveyed techniques/
+
+
+\hfill
+
+
+
+
+
+
+
 \item [Real world legacy code complexity] SPEC CPU2006 benchmarks have proved to be extremely complex. For example, 429.mcf benchmark operates with a network of nodes and arcs laid out linearly in the heap memory. Despite simplicity of  allocation every node and arc structure has numerous pointers, which span several object linking chains. Operations with the data structure are spread all around the benchmark. It is extremely complex to grasp an algorithm and all the data structure details even by the means of manual source code study. Application of static techniques seems infeasible, while application of dynamic techniques is extremely complex.    
 
 
@@ -189,6 +204,9 @@ In January I have rewritten the health benchmark with the first
 \item []\hfill
 
 \end{description}
+
+\section{SPEC CPU2006 feasibility study} This section summarizes the knowledge we have on SPEC CPU2006 benchmarks from the angle of automatic data structure recognition and legacy source code rejuvenation.   
+
 
 
 The machine learning (ML) task solved withing the project of ML assistant can be presented as \textbf{supervised ML classification problem}: \textit{create an ML model of loop parallelisability and train it to classify loops of Seoul National University implementation \cite{snu-npb-benchmarks} of NAS Parallel Benchmarks \cite{nasa-parallel-benchmarks} as parallelisable or not}. The task of ML model creation can be subdivided into 5 sub tasks:
@@ -273,15 +291,16 @@ return mst_weight;
 \quad The algorithm’s work resembles that of an insertion sort. The sequence is divided into 2 parts. Ordered part and unordered part. At first, ordered part consists of just 1 element. On every iteration the algorithm takes the next element out of unordered part, finds it a pairing element inside the ordered part (with the minimal distance between them) and inserts the element into the ordered subsequence next to its pair. At the end we get the sequence with the property that closest dots stand the closest in the sequence.\newline\null
 \quad The benchmark is based on a binary tree being transformed into doubly linked list. 
 
-
-
 Computational method
 
-1) A binary tree is built. Every node of the tree represents a city located on 2D plane with randomly generated (x,y) coordinates. The build_tree() method is written in a way to generate a uniform distribution of dots on the plane.
-
+1) A binary tree is built. Every node of the tree represents a city located on 2D plane with randomly generated (x,y) coordinates. The build\_tree() method is written in a way to generate a uniform distribution of dots on the plane.
 
 
 \paragraph{Computational Frameworks library development}
+\quad As any software development process, the development of the library happened iteratively and non-linearly. The development started with the concept of \textbf{fractal} gleaned out of the algorithm and data structure commonalities among health, perimeter and treeadd benchmarks. Health is the most promising and the most suitable benchmark for the fractal computational framework. The library design started with rewriting the health benchmark with the fractal class template. That was the most simple version of the fractal suitable only for rewriting the health benchmark. Nonetheless, that version was parallelized with the help of OpenMP. The latter led to 20\% of performance improvement relative to the serial legacy C benchmark version.\newline\null
+\quad The next step was an application of fractal framework to the perimeter benchmark. Here an initial fractal version had to be extended. The perimeter benchmark grows a tree, which is not complete i.e. some paths down the tree might be longer than others depending on the stop condition specified by the user. Unlike the health benchmark, perimeter also takes a seed value to grow from. It also had to be added to the interface. The fractal class template grew to a bigger class, which could handle 2 benchmarks.    
+
+
 
 \subsection{"Data-Centric Parallelisation" project}
 \quad The report on DCP project activities is given in a form of DCP project literature review and the feasibility study of 429.mcf, 400.perlbench, 456.hmmer, 470.lbm benchmarks in DCP chapter.
