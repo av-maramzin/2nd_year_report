@@ -261,93 +261,18 @@ Computational method
 
 \subsection{SPEC CPU2006 feasibility study}
 \label{spec_cpu2006_feasibility}
+\quad In the previous year we conducted a feasibility study on SPEC CPU2006 benchmarks. The key lessons we learnt are research interest, legacy source code complexity and close relationship between data structures and algorithms. Further paragraphs give a more detailed report.
+\paragraph{429.mcf} The benchmark operates with a network of nodes and arcs. The latter two are linearly allocated in the heap memory. Despite simplicity of allocation every node and arc structure has numerous pointers, which span several object linking chains. Pointers are set in different places withing the source code base during allocation as well as during consecutive network structure updates. The network is some form of a spanning tree with several properties true of its nodes. Every node has only one child pointer at most. If node has several children they are connected through sibling pointers starting from the first child.\newline\null
+\quad\textbf{The benchmark presents a high interest from the point of data structure recognition, but even a manual source code transformation requires a serious effort. Static automatic techniques seem infeasible, Dynamic ones seem to be a grand challenge.}
 
-\begin{description}[style=nextline]
-\item [Research interest] Some of the SPEC CPU2006 benchmarks present an interest from the point of data structure and algorithmic skeleton recognition. For example, 429.mcf benchmark works with dynamic pointer-linked data structure resembling some form of a spanning tree with child and sibling arcs.  Benchmark 456.hmmer searches a DNA sequence database given a Progile Hidden Markov Model (HMM). Benchmark uses Viterbi algorithm. The implementation works with four dynamic programming matrices allocated linearly as arrays. Algorithm walks either horizontally or diagonally along these matrices and computes reductions of maps. The computation is parallelisable and there has been works doing it \cite{Ganesan:2010:AHG:1854776.1854844}\cite{inria} and accelerating the benchmark on specialised hardware. The benchmark operates with matrices laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. The benchmark would be interesting from the point of algorithmic skeletons recognition, but the implementation core is extremely complex for all 
+\paragraph{456.hmmer} Searches a DNA sequence database given a Profile Hidden Markov Model (HMM). The benchmark uses Viterbi algorithm. The implementation works with four dynamic programming matrices allocated linearly as arrays. Algorithm walks either horizontally or diagonally along these matrices and computes reductions of maps. The computation is parallelizable and there has been works doing it \cite{Ganesan:2010:AHG:1854776.1854844}\cite{inria} and accelerating the benchmark on specialised hardware.\newline\null
+\quad\textbf{The benchmark operates with matrices laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. The benchmark would be an interesting one from the point of algorithmic skeletons recognition, but the \textit{P7Viterbi()} core is relatively complex.}
 
-Benchmark 400.perlbench is a cut-down Perl interpreter and implements a regular expression matching state machine. The main loop takes a pointer to the bit-code of compiled regular expression and processes it instruction by instruction.Although instructions have the same size and are linearly laid out in the memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. Riddled with goto jumps this code requires sequential execution and is beyond the capabilities of any surveyed techniques/
-
-\end{description}
-
-
-
-
-\quad In order to find the ground for the excavation of data structures we conducted a study of SPEC CPU2006 benchmarks. We examined the data structures used withing benchmark hotspots. The motivation behind this is that it is not enough to just recognise the data structures. Having done so, ideally we would need to replace them with faster versions and get performance improvements. On my side I've looked into \textit{429.mcf}, \textit{400.perlbench}, \textit{456.hmmer} and \textit{470.lbm} benchmarks. Paragraphs below present a quick summary.
-
-\paragraph{429.mcf} The top hotspots of the benchmark are functions \textit{refresh\_potential()} and \textit{primal\_bea\_mpp()}. Each of these functions alone accounts for around 35\% of CPU time. The benchmark operates with a network of nodes and arcs. The latter two are linearly allocated in the heap memory with \textit{malloc()} function calls. Despite simplicity of allocation every node and arc structure has numerous pointers, which span several object linking chains. Pointers are set in different places withing the source code base during allocation as well as during consecutive network structure updates. Function \textit{refresh\_potential()} consists of several folded while loops, which go down the network in a depth first search manner starting at root node and following through child and then siblings pointers up until the dead end is met and then returning back up to the root node. That traversal is made in order to update all floating point potentials of network nodes, hence the name of the function. The network is some form of a spanning tree with several properties true of its nodes. Every node has only one child pointer at most. If node has several children they are connected through sibling pointers starting from the first child. If \textit{refresh\_potential()} function updates network nodes, the \textit{primal\_bea\_mpp()} function works with network arcs. It puts network arcs into different baskets and makes basket permutations according to its optimality criterion. It returns the arc out of the first basket as the most optimal.\newline\null
-\quad\textbf{The benchmark presents a high interest from the point of data structure recognition. Although static techniques discussed in the literature review section are unlikely to tackle that level of complexity and dynamic techniques are required.}
-
-\paragraph{456.hmmer} Searches a DNA sequence database given a Progile Hidden Markov Model (HMM). The hotspot is \textit{P7Viterbi()} function being called for every database sequence in the main loop. The function scores sequences using Viterbi algorithm. The implementation works with four dynamic programming matrices (Match - MMX, Insert - IMX, Delete - DMX, Extra - XMX) allocated linearly as arrays. Algorithm walks either horizontally (I,X) or diagonally (M,D) along these matrices and computes reductions of maps. The computation is parallelisable and there has been works doing it \cite{Ganesan:2010:AHG:1854776.1854844}\cite{inria} and accelerating the benchmark on specialised hardware.\newline\null
-\quad\textbf{The benchmark operates with matrices laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. The benchmark would be interesting from the point of algorithmic skeletons recognition, but the \textit{P7Viterbi()} core is relatively complex.} 
-
-\paragraph{400.perlbench} This benchmark is a cut-down Perl interpreter. As our hotspot analysis showed \textit{S\_regmatch()} is the main consumer of CPU time. This function implements a regular expression matching state machine. Listing \ref{lst:perlbench} shows the source code of the function. Function \textit{S\_regmatch()} takes a pointer to the bitcode of compiled regular expression and processes it instruction by instruction. Although instructions have the same size and are linearly laid out in the memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. Every case of the gigantic (1541 LOC) \textit{switch} statement interprets bitcode instructions according to their opcode semantics. The latter examines external buffer with a string to match and can be arbitrarily complex leading to recursive \textit{S\_regmatch()} calls and goto jumps. This code requires sequential execution and is beyond the capabilities of any surveyed techniques.
-\begin{minipage}[t]{\linewidth}
-\begin{lstlisting}[caption={\textbf{regexec.c(2296)}: Regular expression matching state machine},label={lst:perlbench},language=C]
-
-S_regmatch(regnode *prog) {
-    regnode* scan;
-    
-    scan = prog;
-    while (scan != NULL) {
-        next = scan + scan->next_off
-        switch(OP(scan)) {
-        case SEOL:
-            ...
-            goto no;
-        case MEOL:
-            ...
-        case EVAL:
-            S_regmatch(...);
-        case EXACT:
-            ...
-        }
-    
-    }
-}
-\end{lstlisting}
-\end{minipage}
-
+\paragraph{400.perlbench} This benchmark is a cut-down Perl interpreter and implements a regular expression matching state machine. The benchmark processes the bitcode of compiled regular expression instruction by instruction. Although instructions have the same size and are linearly laid out in the memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. This code requires sequential execution and is beyond the capabilities of any existent techniques.
 \quad\textbf{The benchmark is neither parallel nor a simple one. And it makes no point to apply any recognition techniques here.}
 
-\paragraph{470.lbm} The benchmark implements a Lattice Boltzmann Method (LBM) and is a relatively simple one (around ~1400 LOC). The hotspot is \textit{LBM\_performStreamCollide()} function. The main underlying data structures our benchmark works with are the two 3D grids (\textit{Src} and \textit{Dst}) mapped onto a linear array space, which simulate incompressible fluids in 3D. The benchmark runs a specified number of time steps. During each time step the benchmark linearly runs along \textit{Src} array. Every array element represents a point from a 3D grid and consists of a number of velocity vector projections (South, North, East, West, Top, Bottom,  ... , South-East, etc.) at this point. The values of these projections are being combined and mapped in a stencil fashion onto adjacent elements of independent \textit{Dst} array. The computation is highly parallel and corresponds to a sweeping of \textit{xy} planes (one plane after another) along \textit{z} axis. The benchmark has already been parallelised with an OpenMP pragma in a per element fashion. This benchmark could potentially be used for the discovery of stencil computational idioms. Linear arrays being used in the benchmark do not represent a huge amount of interest from a data-centric point.\newline\null
+\paragraph{470.lbm} The benchmark implements a Lattice Boltzmann Method (LBM) and is a relatively simple one (around ~1400 LOC). The main underlying data structures our benchmark works with are the two 3D grids mapped onto a linear array space, which simulate incompressible fluids in 3D. The benchmark runs a specified number of time steps. During each time step the benchmark linearly runs along \textit{Src} array. Every array element represents a point from a 3D grid and consists of a number of velocity vector projections (South, North, East, West, Top, Bottom,  ... , South-East, etc.) at this point. The values of these projections are being combined and mapped in a stencil fashion onto adjacent elements of independent \textit{Dst} array. The computation is highly parallel and corresponds to a sweeping of \textit{xy} planes (one plane after another) along \textit{z} axis. The benchmark has already been parallelised with an OpenMP pragma in a per element fashion. This benchmark could potentially be used for the discovery of stencil computational idioms. Linear arrays being used in the benchmark do not represent a huge amount of interest from a data-centric point.\newline\null
 \quad\textbf{The benchmark operates with 3D grids laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. It would be interesting to try to recognize an algorithmic stencil.}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\subsection{"Data-Centric Parallelisation" project}
-\quad The report on DCP project activities is given in a form of DCP project literature review and the feasibility study of 429.mcf, 400.perlbench, 456.hmmer, 470.lbm benchmarks in DCP chapter.
 
 \chapter{Computational Frameworks}
 
