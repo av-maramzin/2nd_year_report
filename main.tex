@@ -19,7 +19,7 @@
 
 \addbibresource{main.bib}
 
-\title{\centering \textbf{Second Year Review\thanks{Progress report and thesis vision}}\\Towards Alleviating The Task of Software Parallelization}
+\title{\centering \textbf{Second Year Review\thanks{Progress report and thesis vision}}\\Towards Alleviating The Task of Software Parallelization\\\textit{Assistant Solution}}
 \author{Aleksandr Maramzin\\s1736883}
 \date{June 2020}
 
@@ -90,35 +90,13 @@
 \end{abstract}
 
 \chapter{Thesis Vision\\{\Large Research Path}}
-\quad In our work we address the topic of \textbf{software parallelization}. Software parallelization is a multifaceted and complex task. A perfectly decomposable and parallelizable problem might end up being implemented with an unsuccessfully chosen non-parallelizable algorithm. And the algorithm in its turn might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. Legacy source code bases have been designed primarily for serial machines and are rich with all these sub-optimal from the angle of software parallelization programming decisions.\newline\null
-\quad Despite decades of research into parallelizing compiler technology, the latter still fails to tackle real world legacy code challenges and software parallelization remains a largely manual task where the key resource is expert time. We do not strive to find a "silver bullet", instead we acknowledge the role of a programmer in the software parallelization process and aim at alleviating the task.\newline\null
 \quad The work started during my MSc by Research year with an idea of "Software Metrics for Parallelism". The idea was based on the similar work in the field of software quality metrics. Cyclomatic complexity (CC) software metric might be taken as an illustrative example, which quantitatively characterizes the difficulty of program comprehension. The idea of "Software Metrics for Parallelism" has passed through several stages of lost and revived interest. As we implemented our parallelizability metrics inside the LLVM and finally got to see their behaviour on SNU NPB benchmark suite, we observed the weakness of metrics correlation with software parallelizability property. That was right at the end of my MSc by the Research. Then we decided to use the metrics as machine learning features and created a model of loop parallelizability. The predictive accuracy was initially low causing us to doubt in learnability of that property for the SNU NPB suite. It took us a while before we managed to get an acceptable above 90\% level. At this point we realized that it is not enough to just learn loop parallelizability property. We developed an assistant scheme extending Intel Compiler's parallelism discovery capabilities. But parallelizability does not necessarily materialize into actual performance improvements. We had to create a crafty scheme taking an application profile and using ML model to ultimately point the best loops to concentrate a programmer efforts on. All that resulted into an end-to-end tool assisting a programmer by providing the latter with the best loop ranking to start parallelisation with.\newline\null
-\quad But the tool we developed is just a piece in a final solution package we aim to get. The next step would be to tackle the problem of heap allocated pointer linked data structures. At least we would like to develop a tool capable of their recognition (is it a tree or a linked list?, etc). As the literature review section of DCP project and SPEC CPU2006 feasibility studies show, static methods (such as shape analysis o
-r Idiom Description Language (IDL) based on a constraint solver) are unlikely to recognize data structures of SPEC CPU complexity level. We need to use dynamic techniques, which would recreate a dynamic model of data structure heap layout. Vast array of recent work in that direction proves that feeling.
-
-
-
-
-Despite decades of research into parallelizing compiler tech-nology, software parallelization remains a largely manualtask where the key resource is expert time. In this paperwe focus on the time-consuming task of identifying thoseloops in a program, which are both worthwhile and feasible to parallelize. We present a methodology and tool whichmake better use of expert time by guiding their effort directlytowards those loops, where the largest performance gainscan be expected while keeping analysis and transformationeffort at a minimum.We have developed a novel parallelization assistant thatprovides programmers with a ranking of all loops in a pro-gram based on their overall merit. For each loop this metriccombines its potential contribution to speedup and an es-timated probability for its successful parallelization. Thisprobability is predicted using a machine learning model,which has been trained, validated, and tested on 1415 la-belled loops, achieving a prediction accuracy greater than90%.We have evaluated our parallelization assistant againstsequential C applications from the SNU NAS benchmarksuite. We show that our novel methodology achieves par-allel performance levels comparable to those from expertprogrammers while requiring less expert time. On average,our assistant reduces the number of lines of code that have to
-
-
-\quad Efficient software parallelization requires work to be done at several levels of abstraction. A programmer starts at a high algorithmic level and makes decisions on problem decomposition and software architecture.       
-
-
-
-
+\quad In parallel with our ML-based loop parallelization tool we started a work on another project of "Data-Centric Parallelization". The work started with a feasibility study on SPEC CPU2006 benchmarks and an extensive literature review on the automatic data structure recognition. We have looked at some of the benchmarks and got an insight into the problems and complexity of those. While static techniques seemed unfeasible, dynamic techniques seemed like a grand challenge. We decided to move onto another suite of benchmarks. Olden benchmarks also represent the real world code, but are smaller and simplier than SPEC CPU2006 benchmarks. Three of Olden benchmarks perform a very similar on a conceptual level computation, which resembles a tree accumulation, but leaves some side-effects. We decided to frame that observation into the notion of fractal and implemented the latter as a class template. The fractal template has been used to rewrite the benchmarks in the modern more structured and easy to comprehend way. Having done so we got 20\% performance improvement on the health benchmark.      
 
 \chapter{$2^{nd}$ Year Timeline}
-\quad This chapter describes all activities I have been doing during the $2^{nd}$ year of my PhD. Section \ref{active_timeline} maps them onto the year's timeline. Section \ref{active_description} gives detailed descriptions. After passing the first year review I started my second year with the work towards attending AI-SEPS 2019 workshop. After the workshop at the end of October and a meeting with Bjoern I have properly started with the "Data-Centric Parallelisation (DCP)" project. As our SPEC CPU2006 feasibility studies showed it would be extremely difficult to automatically recognise data structures in SPEC CPU2006 benchmarks. Data structures there are entangled with algorithms and spread across the whole source code base.          
+\quad This chapter describes all activities I have been doing during the $2^{nd}$ year of my PhD. Section \ref{active_timeline} maps them onto the year's timeline. Section \ref{active_description} gives detailed descriptions.\newline\null
+\quad After passing the $1^{st}$ year review I started my second year with the work towards attending AI-SEPS 2019 workshop with my work on "Machine Learning Based Software Parallelization Assistant". After the workshop at the end of October and a meeting with Bjoern I have properly started with the "Data-Centric Parallelisation (DCP)" project. As our SPEC CPU2006 feasibility studies showed in the previous year it would be extremely difficult to automatically recognise data structures in the benchmark suite of that complexity. We decided to move onto a simpler suite of benchmarks. I spent the whole November and December studying several of Olden benchmarks and writing reports on them from the point of data structure recognition and abstraction level lifting. At around Christmas the notion of the Fractal has been coined inspired by computations and data structures present in several Olden benchmarks. Since January I have been working on the design of the library of computational frameworks and rewriting Olden benchmarks with their help.
 
-
-I started the second year of my PhD with passing the first year review and starting to work towards presenting my work on "Machine Learning Based Software Parallelisation Assistant (ML assistant)" at AI-SEPS2019 workshop. After the attendance of the workshop at the end of October I have completely switched onto the "Data-Centric Parallelisation (DCP)" project I started to work on during the previous year. Having finished the literature review for the DCP project and having looked at the SPEC CPU2006 benchmark it has been concluded, that we need a simpler set of benchmarks for the work to be feasible. I spent the whole November and December studying several of Olden benchmarks and writing reports on them from the point of data structure recognition and abstraction level lifting. At around Christmas the notion of the Fractal has been coined inspired by the computations and data structures present at several Olden benchmarks. And since that time I started to work  
-
-
-In January I have rewritten the health benchmark with the first            
-
-
-   
 \section{The Timeline of My Second Year Activities}
 \label{active_timeline}
 \begin{description}[style=nextline]
@@ -452,12 +430,9 @@ class Framework {
 \quad There were several questions raised in the design process of a template library. 
 
 \section{Performance of the library}
-\quad We have rewritten old legacy C implementations of 4 Olden benchmarks: health, perimeter, treeadd and power. The table below shows the performance gains our versions have over old sequential implementations.
+\quad We have rewritten old legacy C implementations of 4 Olden benchmarks: health, perimeter, treeadd and power. 
 
-\section{SPEC CPU2006 Feasibility Study}
-
-
-\section{DCP plan}
+\chapter{Future plans}
 \quad I am planning to work solely on the DCP project throughout the second year of my PhD. This section very roughly approximates the plan I am going to follow.
 
 \begin{description}[style=nextline]
