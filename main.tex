@@ -62,6 +62,37 @@
 
 % parallel hardware is ubiquitous, but software is sequential
 
+\quad Parallel hardware has become ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion. In order to exploit all available hardware facilities software has to be parallelized.
+
+% software parallelization is a complex and multifaceted topic 
+
+\quad The task of \textbf{software parallelization} is multifaceted and complex. A perfectly decomposable and parallelizable problem might end up being implemented with an unsuccessfully chosen non-parallelizable algorithm. And the algorithm in its turn might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. Legacy source code bases have been designed primarily for serial machines and are rich with all these sub-optimal from the angle of software parallelization programming decisions.
+
+% a knowledge programmers should possess 
+
+\quad To avoid making all the above implementation mistakes programmers need to possess an additional knowledge in various domains of parallel programming. It is not always realistic to expect such a deep expertise from an average programmer. Decades of research have gone into parallelizing compiler technology, but despite all the advances it still fails to tackle real world legacy code challenges. Software parallelization remains a largely manual task where the key resource is expert time.
+
+% automatic parallelization obstacles 
+
+\quad Given the obstacles automatic parallelization faces today, we do not expect a breakthrough in the area or a "silver bullet" solving the problem in the near future. We acknowledge the role of a human expert, but at the same time we propose an \textbf{assistant solution}, which can be used to guide programmer's efforts and alleviate the manual parallelization task.
+
+% assistant solution
+
+\quad The assistant solution we propose is as multifaceted as the problem itself. To fully exploit all the potential of software parallelization a programmer has to work on several conceptual levels. 
+
+% computational frameworks library
+
+\quad The programmer starts on the high level of problem domain and algorithm. The task is to find independent parts in the problem to be solved in parallel. If there are dependencies among them, then the programmer has to design a synchronization mechanism. In our solution package we propose an off-the-shelf C++ template library of computational frameworks. The latter are ready to use parallelism patterns. A programmer only needs to customize his computation through an LLVM-like interface.
+
+% software parallelization assistant
+
+\quad Another tool from our solution package work on the lower final implementation level and aims at finer-grained parallelism, specifically program loops. The designed tool is basically a machine learning (ML) based model of loop parallelisability integrated and utilised into an assistant scheme. Assistant takes an application to be parallelised along with its profile as an input and presents a programmer with a ranking of application loops. In contrast to a profile guided approach, assistant's ranking highlights application loops, which are not only long-running (and thus potentially profitable), but crucially parallelisable. This way a programmer concentrates his efforts on promising application loops and converges to the best achievable performance faster. We have deployed our assistant on SNU NAS Parallel Benchmarks \cite{snu-npb-benchmarks} \cite{nasa-parallel-benchmarks} and demonstrated a potential of our idea \cite{aiseps}.
+\end{abstract}
+
+\chapter{Introduction}
+
+% parallel hardware is ubiquitous, but software is sequential
+
 \quad Parallel hardware has become ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion: be it an old legacy software initially designed to run on the available at that time serial hardware or modern applications being developed by application domain experts rather than performance engineers. In order to exploit all available hardware facilities software has to be parallelized.
 
 % software parallelization is a complex and multifaceted topic 
@@ -87,7 +118,9 @@
 % software parallelization assistant
 
 \quad Another tool from our solution package work on the lower final implementation level and aims at finer-grained parallelism, specifically program loops. The designed tool is basically a machine learning (ML) based model of loop parallelisability integrated and utilised into an assistant scheme. Assistant takes an application to be parallelised along with its profile as an input and presents a programmer with a ranking of application loops. In contrast to a profile guided approach, assistant's ranking highlights application loops, which are not only long-running (and thus potentially profitable), but crucially parallelisable. This way a programmer concentrates his efforts on promising application loops and converges to the best achievable performance faster. We have deployed our assistant on SNU NAS Parallel Benchmarks \cite{snu-npb-benchmarks} \cite{nasa-parallel-benchmarks} and demonstrated a potential of our idea \cite{aiseps}.
-\end{abstract}
+
+
+
 
 \chapter{Thesis Vision\\{\Large Research Path}}
 \quad The work started during my MSc by Research year with an idea of "Software Metrics for Parallelism". The idea was based on the similar work in the field of software quality metrics. Cyclomatic complexity (CC) software metric might be taken as an illustrative example, which quantitatively characterizes the difficulty of program comprehension. The idea of "Software Metrics for Parallelism" has passed through several stages of lost and revived interest. As we implemented our parallelizability metrics inside the LLVM and finally got to see their behaviour on SNU NPB benchmark suite, we observed the weakness of metrics correlation with software parallelizability property. That was right at the end of my MSc by the Research. Then we decided to use the metrics as machine learning features and created a model of loop parallelizability. The predictive accuracy was initially low causing us to doubt in learnability of that property for the SNU NPB suite. It took us a while before we managed to get an acceptable above 90\% level. At this point we realized that it is not enough to just learn loop parallelizability property. We developed an assistant scheme extending Intel Compiler's parallelism discovery capabilities. But parallelizability does not necessarily materialize into actual performance improvements. We had to create a crafty scheme taking an application profile and using ML model to ultimately point the best loops to concentrate a programmer efforts on. All that resulted into an end-to-end tool assisting a programmer by providing the latter with the best loop ranking to start parallelisation with.\newline\null
@@ -95,9 +128,9 @@
 
 \chapter{$2^{nd}$ Year Timeline}
 \quad This chapter describes all activities I have been doing during the $2^{nd}$ year of my PhD. Section \ref{active_timeline} maps them onto the year's timeline. Section \ref{active_description} gives detailed descriptions.\newline\null
-\quad After passing the $1^{st}$ year review I started my second year with the work towards attending AI-SEPS 2019 workshop with my work on "Machine Learning Based Software Parallelization Assistant". After the workshop at the end of October and a meeting with Bjoern I have properly started with the "Data-Centric Parallelisation (DCP)" project. As our SPEC CPU2006 feasibility studies showed in the previous year it would be extremely difficult to automatically recognise data structures in the benchmark suite of that complexity. We decided to move onto a simpler suite of benchmarks. I spent the whole November and December studying several of Olden benchmarks and writing reports on them from the point of data structure recognition and abstraction level lifting. At around Christmas the notion of the Fractal has been coined inspired by computations and data structures present in several Olden benchmarks. Since January I have been working on the design of the library of computational frameworks and rewriting Olden benchmarks with their help.
+\quad After passing the $1^{st}$ year review I started my second year with the work towards attending AI-SEPS 2019 workshop with my work on "Machine Learning Based Software Parallelization Assistant". After the workshop at the end of October and a meeting with Bjoern I have properly started with the "Data-Centric Parallelisation (DCP)" project. As our SPEC CPU2006 feasibility studies showed in the previous year it would be extremely difficult to automatically recognise data structures in the benchmark suite of that complexity. We decided to move onto a simpler suite of benchmarks. I spent the whole November and December studying several of Olden benchmarks and writing reports on them from the point of data structure recognition and abstraction level lifting. At around Christmas the notion of the Fractal has been coined inspired by computations and data structures present in several Olden benchmarks and backed up by the theoretical work on tree reductions \cite{tree-reductions}. That finished the stage of feasibility study, literature review and research project search. After the Christmas break I started to work towards designing a C++ template library of computational frameworks (fractal, fold, reduce, etc.) and rewriting Olden benchmarks with their help. At the point of the annual review the design of the library has been finished and 4 Olden benchmarks have been rewritten to use it. There is a need to make some minor fixes and adjustments and conduct the final performance measurement experiment.
 
-\section{The Timeline of My Second Year Activities}
+\section{The Timeline of My $2^{nd}$ Year Activities}
 \label{active_timeline}
 \begin{description}[style=nextline]
 \item [Sep (Annual Review and AI-SEPS 2019 presentations)]\hfill
@@ -136,33 +169,36 @@
 \renewcommand\labelitemi{$\bullet$}
 \item Developed and designed a Fractal class template
 \item Rewrote health benchmark with the Fractal template and got 20\% performance improvement
-\item Paper on Tree Accumulations as the theoretical foundation for Fractal
+\item Paper on Tree Accumulations \cite{tree-reductions} as the theoretical foundation for Fractal
 \end{itemize}
 \item [Feb (Fractal redesign)]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
-\item Rewrote Fractal class template 
+\item Rewrote the Fractal class template to fit 2 more Olden benchmarks 
 \item Rewrote perimeter and treeadd Olden benchmarks to use the new Fractal class
+\item C++ background reading on the template mechanism
 \end{itemize}
 \item [Mar (Fold and Reduce computational frameworks)]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item ResearchFish report writing
 \item Work on the power Olden benchmark
-\item Work on Fold and Reduce frameworks 
+\item Work on Fold and Reduce frameworks
+\item C++ background reading on the inheritance and derived classes mechanism
 \end{itemize}
 \item [Apr (Fold and Reduce computational frameworks)]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item Work on Fold and Reduce frameworks
-\item Redesign of Fractal framework for coherence with Fold and Reduce
+\item Redesign of the Fractal framework for API coherence with Fold and Reduce
+\item Rewriting health, treeadd, perimeter benchmarks with the new Fractal
 \item Work on the power benchmark
 \end{itemize}
 \item [May]\hfill
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item Thesis writing
-\item [Reading] Software architecture design patterns
+\item Reading on software architecture design patterns (Gang of Four)
 \item Work on the library as the whole
 \end{itemize}
 \item [Jun (Second Year Report Writing)]\hfill
@@ -179,10 +215,10 @@
 \quad During the $2^{nd}$ year of my PhD I continued to work towards the "Data-Centric Parallelization (DCP)" project. In the previous year we conducted a feasibility study on SPEC CPU2006 benchmarks as an initial step towards the automatic data structure recognition and source code rejuvenation. That created the ground for this year's work. Looking at the real world code of SPEC CPU2006 benchmarks we have learnt some things regarding the problem we are tackling. A more detailed report can be found in section \ref{spec_cpu2006_feasibility}.
 \begin{description}[style=nextline]
 \item [Research interest] Some of the SPEC CPU2006 benchmarks present an interest from the angle of data structures and algorithmic skeletons recognition.\hfill
-\item [Real world legacy code complexity] SPEC CPU2006 benchmarks are extremely complex. It requires a serious effort to comprehend and manually rewrite them with an alternative implementation. Automatic static techniques seem infeasible, while dynamic techniques seem to be a grand challenge.\hfill
+\item [Real world legacy code complexity] SPEC CPU2006 benchmarks are extremely complex. It requires a serious effort even to comprehend and manually rewrite them with an alternative implementation. Automatic static techniques seem infeasible, while dynamic techniques seem to be a grand challenge.\hfill
 \item [Close relationship between algorithms and data structures] Unfortunately, it is quite common in the real world legacy code to see data structures, their update and manipulation operations and the main application algorithms to be entangled together in a same chunk of code. Moreover, functionality pieces are often spread all around the code base. Sometimes, algorithms and data structures are logically inseparable. That makes the motivating case for the creation of computational frameworks as the notion unifying data structures and algorithms together.\hfill
 \end{description}
-\quad Following the SPEC CPU2006 feasibility study we moved onto another suite of benchmarks. Olden benchmarks are smaller and simpler, but at the same time represent the real world legacy code with all its problems. Throughout the year I have been working the the suite doing the following: 
+\quad Following the SPEC CPU2006 feasibility study we moved onto another suite of benchmarks. Olden benchmarks are smaller and simpler, but at the same time represent the real world legacy code with all its problems. Throughout the year I have been working on the suite doing the following: 
 \begin{itemize}
 \renewcommand\labelitemi{$\bullet$}
 \item Olden benchmarks study
@@ -190,7 +226,7 @@
 \item Olden benchmarks rewriting
 \item Thesis writing
 \end{itemize}
-\quad All the above tasks are interdependent and happened iteratively and in close cooperation with one another.
+\quad All the above tasks are interdependent and happened iteratively and in close cooperation with each other.
 \subsection{Olden benchmarks study}
 \label{olden_benchmarks_study}
 \quad Olden benchmark suite consists of 10 benchmarks. I have looked at 6 of those (bisort, health, perimeter, treeadd, mst and tsp benchmarks). 
