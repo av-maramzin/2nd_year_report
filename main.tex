@@ -300,22 +300,12 @@ return mst_weight;
 
 \chapter{Computational Frameworks}
 
+\section{Introduction}
+\quad For many decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to human reasoning and understanding. There have been several breaking points. A move from assembly languages to languages like Fortran and C increased the productivity of programmers by supporting structuredness and modularity and offloading many routine and tedious tasks onto the compilation software. C and Fortran were high-level languages of that time, but still a low-level languages for today's standards. These languages support an imperative programming paradigm. The main characteristic of that is the concept of state. The statements of the language read and update the state. Procedures pass the state and results around achieving the final goal of the program.\newline\null
+\quad The trend of moving from low to higher abstraction levels is not only true for software engineering in general, but for parallel software engineering in particular. Modern hardware provides a diverse and vast support for different forms of parallelism: pipelined CPUs with out-of-order and superscalar instruction execution, vector extensions of modern CPU instruction sets, multi-core processors running as part of multi-processor system, etc. Given a sequential program a programmer can work at the finest level of granularity by choosing vector instructions over scalar ones and changing their relative order trying to minimise the number of pipeline stalls and memory waits. To exploit a coarse-grain parallelism a programmer can rewrite a program in a multi-threaded fashion. Here a programmer may choose to work with the operating system interface like POSIX threads or use higher-level parallel programming models like shared memory OpenMP or distributed memory MPI. Although high level these models still work at the level of abstract parallel machine. Algorithmic skeletons work at the level of abstract parallel algorithmic patterns such as map, reduce, pipeline, etc.\newline\null
+\quad In our project we propose a notion of computational frameworks and develop a prototype C++ template library. Computational frameworks are a blend of algorithmic patterns and their supporting data structures. In that sense computational frameworks provide a higher level concept for a programmer to use. If the problem a programmer is tackling fits into some of the frameworks, then the programmer only needs to specify a custom part in the framework's API.
+
 \section{Background}
-\quad For many decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to a human reasoning and understanding. There have been several breaking points. A move from assembly languages to languages like Fortran and C increased the productivity of programmers by supporting structuredness and modularity and offloading many routine and tedious tasks onto a compilation software. C and Fortran were high-level languages of that time, but still a low-level languages for today's standards. These languages support an imperative programming paradigm. The main characteristic of that is the concept of state. The statements of the language read and update the state. Procedures pass the state and results around achieving the final goal of the program.   
-
-\quad The trend of moving from low to higher abstraction levels is not only true for software engineering in general, but for parallel software engineering in particular. Modern hardware provides a diverse and vast support for different forms of parallelism: pipelined CPUs with out-of-order and superscalar instruction execution, vector extensions of modern CPU instruction sets, multi-core processors running as part of multi-processor system, etc. Given a sequential program a programmer can work at the finest level of granularity by choosing vector instructions over scalar ones and changing their relative order trying to minimise the number of pipeline stalls and memory waits. To exploit a coarse-grain parallelism a programmer can rewrite a program in a multi-threaded fashion. Here a programmer may choose to work with the operating system interface like POSIX threads or use some 
-
-abstract parallel machine models   
-
-
-level by rewriting program instructions by preferring vector ones to a scalar or change their relative order trying to minimise the number of pipeline stalls    
-
-in modern computing systems a programmer may 
-
-sequential program a programmer can work with its instructions directly by 
-
-
-
 \subsection{Data-Centric Parallelization}
 \label{chapter_dcp}
 \subsubsection{The Problem}
@@ -362,7 +352,7 @@ Visitor pattern roughly corresponds to fold.
 \quad Declarative programs do not specify the exact sequence of steps and state updates a program needs to do in order to get the desired result. Declarative programs declare the properties of the desired result. The properties can be specified as a set of constraints like in constraint programming or a set of linear inequalities like in linear programming. Functional programming is another subtype of declarative programming. In functional programming the final desired result is specified as a sequence of stateless function evaluations. Among the most common functions are map, reduce, fold, etc.
 
 \subsection{Parallel Algorithmic Skeletons}
-
+\quad 
 
 
 
@@ -456,21 +446,26 @@ class Framework {
 \quad We have rewritten old legacy C implementations of 4 Olden benchmarks: health, perimeter, treeadd and power. 
 
 \chapter{Future plans}
-\quad I am planning to work solely on the DCP project throughout the second year of my PhD. This section very roughly approximates the plan I am going to follow.
-
+\quad I am planning to continue the work on the computational frameworks in the next year. I see several interrelated directions to continue my work, but the first next steps would be an assessment of the library and its extension.
 \begin{description}[style=nextline]
-\item [Detailed Literature Review] Get into the details of currently available dynamic data structure recognition tools (like MemPick, DDT, ARISTE, DSI, DSIbin, HeapDbg, DsOli, etc.). The detailed study will help me see the current deficiencies of these tools, competing techniques they use, the results they manage to achieve. 
-
-\item [Technical Implementation Planning] In this stage I would need to choose the exact libraries and frameworks I will use as the base for the implementation of my data structure recognition tool. Currently I am looking at Pin and LLVM. Pin is a dynamic binary instrumentation framework for the IA-32, x86-64 and MIC instruction-set architectures that enables the creation of dynamic program analysis tools. Alternatively, instrumentation can be done at LLVM IR level.
-
-\item [The Search of Suitable Benchmarks] SPEC CPU2006 benchmarks proved to be difficult for automatic (and even manual) data structure recognition. Maybe MCF benchmark could be used for an attempt to dynamically recognize a tree like data structure, but for a more feasible result we would need to find simpler benchmarks. SNU NPB benchmarks do not contain any data structures but linear arrays. A study of Olden benchmarks could be conducted. There has been proposed an idea of searching GitHub through its API for a simpler examples being from a real world at the same time. Alternatively Rodinia and Parboil benchmark suites might be used for a study.
-
-\item [Memory Graph Construction] In this task we need to determine the exact way we are going to build a graph. The types of nodes and the way we connect them. Majority of tools like DDT \cite{1669122} use heap allocated nodes as memory graph composing elements. On the contrary Data Structure Investigator (DSI) tool \cite{Rupprecht:2017:DID:3155562.3155607} uses strands (abstractions over a linked list data structure) as primitives chasing recognition of Linux kernel CDLL list of different element types. The task is similar to the task of compiler's Intermediate Representation (IR) design and is going to affect all other stages.
-
-\item [Memory Graph Analysis] Once the memory graph corresponding to some particular instance of dynamic program execution is built, the task is to recognize a data structure the graph might correspond to. The current techniques examine the properties of memory graphs (the number of edges per node, cycles, connectivity, etc.), try to apply machine learning and clustering techniques in order to learn to recognize  
-\item [Data Structure Replacement] This is the most ambitious goal one might dream to achieve. Neither of all available tools has managed to do that. The task is to detect and replace unsuccessfully chosen data structure variants with a better suited one (like AVL tree instead of a binary search tree).   
-
+\item [Comprehensive Library Assessment] The very first next step would be to devise an assessment strategy for our library. Here I mean the version of the library with Fractal, Fold and Reduce frameworks designed to tackle 4 Olden benchmarks. Rewritten benchmarks performance is an important, but a single metric. On the other side, our library has to be easy to use. Here, I am thinking of using small toy examples implemented in a legacy C style and compared against their rewritten with the help of the library versions. Metrics such as Lines Of Code (LOC) could be used to measure the source code ease of comprehension. I expect this assessment to provide us with a feedback on the library design and lead to a more stable library version.
+\item [Library extension (Autumn)] A parallel to the assessment direction could be an extension of the library with additional frameworks. The next steps would be to add a Map framework and rewrite a SPEC CPU2006 456.hmmer benchmark with Maps and Reductions. Then I a Graph template could be added to tackle mst and tsp Olden benchmarks. Benchmarks bh, voronoi and em3d are more complex and perform scientific computations, but an effort can be thrown to find something in them.
 \end{description}
+\quad After the assessment and extension steps are done we are going to have a C++ template library of computational frameworks (Fractal, Fold, Reduce, Map and Graph) tackling 6 Olden and 1 SPEC CPU2006 benchmarks. That work can be wrapped up in the first publication. That work can be done by the end of September or around mid-autumn.\newline\null
+\quad The next work would be based on the library and aim at an automatic recognition of computational frameworks and legacy C source code substitution with the library calls.
+\begin{description}[style=nextline]
+\item [Automatic recognition] Benchmarks health and treeadd are simple enough to try to automatically detect that a recursive build tree and simulate procedures are actually constitute the body of the Fractal framework. The source code of the benchmarks is going to be  
+\item [Automatic substitution] Benchmarks health and treeadd are simple enough to try 
+\item [Clang LibTooling study] 
+\end{description}
+\quad After that stage I expect to have a library of computational frameworks and an assistant tool. The tool is going to aim at the automatic recognition of the frameworks and automatic source code substitution.   
+
+or at least highlighting of the frameworks. 
+
+
+\newline\null
+
+
 
 \printbibliography
 
